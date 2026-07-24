@@ -3,1594 +3,215 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>ZEUS SHADOW - Rise From Darkness</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#0a0015;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#fff;-webkit-user-select:none;user-select:none}
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:#0d0018}
-::-webkit-scrollbar-thumb{background:#6a2b8a;border-radius:3px}
-#particleCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
-.screen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:10;display:none;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;opacity:0;transition:opacity 0.6s ease;padding:20px}
-.screen.active{display:flex;opacity:1}
-.screen-bg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-1;background:radial-gradient(ellipse at center,#1a0030 0%,#0a0015 60%,#03000a 100%)}
-.screen-bg::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='g' patternUnits='userSpaceOnUse' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='1' fill='rgba(106,43,138,0.07)'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='60' height='60' fill='url(%23g)'/%3E%3C/svg%3E");opacity:0.5}
-.title-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;text-align:center}
-.title-glitch{font-size:clamp(10px,1.5vw,16px);color:rgba(201,168,76,0.5);letter-spacing:8px;text-transform:uppercase;font-weight:300;margin-bottom:5px;animation:fadeIn 2s ease}
-.title-main{font-size:clamp(48px,12vw,140px);font-weight:900;background:linear-gradient(180deg,#ffd700 0%,#c9a84c 30%,#8a6b2b 60%,#3a2b0b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 60px rgba(201,168,76,0.3));letter-spacing:2px;line-height:1;animation:titlePulse 4s ease-in-out infinite alternate}
-.title-divider{width:clamp(120px,30vw,400px);height:2px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);margin:12px 0}
-.title-sub{font-size:clamp(12px,1.8vw,22px);color:#b8a0d0;letter-spacing:10px;text-transform:uppercase;text-shadow:0 0 30px rgba(180,120,255,0.3);margin-bottom:25px}
-.title-dev{font-size:clamp(8px,1vw,12px);color:rgba(201,168,76,0.3);letter-spacing:4px;margin-bottom:5px}
-@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
-@keyframes titlePulse{0%{filter:drop-shadow(0 0 60px rgba(201,168,76,0.3))}100%{filter:drop-shadow(0 0 100px rgba(201,168,76,0.5))}}
-.btn{position:relative;min-width:clamp(160px,20vw,280px);padding:13px 30px;background:linear-gradient(135deg,rgba(106,43,138,0.2),rgba(40,15,60,0.4));border:1px solid rgba(201,168,76,0.2);color:#d0c0e0;font-size:clamp(12px,1.1vw,16px);cursor:pointer;transition:all 0.35s ease;border-radius:6px;text-align:center;letter-spacing:3px;text-transform:uppercase;font-weight:600;font-family:inherit;outline:none}
-.btn:hover{background:linear-gradient(135deg,rgba(106,43,138,0.5),rgba(60,20,90,0.7));border-color:#c9a84c;color:#fff;transform:translateY(-2px);box-shadow:0 8px 30px rgba(201,168,76,0.15)}
-.btn:active{transform:translateY(0px) scale(0.98)}
-.btn-gold{background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(139,109,46,0.2));border-color:rgba(201,168,76,0.4)}
-.btn-gold:hover{background:linear-gradient(135deg,rgba(201,168,76,0.3),rgba(139,109,46,0.4))}
-.btn-danger{background:linear-gradient(135deg,rgba(180,40,40,0.15),rgba(100,20,20,0.25));border-color:rgba(180,40,40,0.3)}
-.btn-danger:hover{background:linear-gradient(135deg,rgba(180,40,40,0.35),rgba(100,20,20,0.45));border-color:#cc4040}
-.btn-sm{min-width:110px;padding:9px 16px;font-size:11px;letter-spacing:1.5px}
-.btn-menu{display:flex;flex-direction:column;align-items:center;gap:7px;margin-top:5px;animation:menuSlideUp 1s ease}
-@keyframes menuSlideUp{0%{opacity:0;transform:translateY(40px)}100%{opacity:1;transform:translateY(0)}}
-.scroll-container{position:relative;width:100%;max-height:100vh;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:40px 20px}
-#intro-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:100;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px}
-#intro-overlay.active{display:flex}
-.intro-text{font-size:clamp(18px,2.8vw,40px);color:#e0d0f0;text-align:center;max-width:850px;line-height:1.7;opacity:0;transition:opacity 1.8s ease;position:absolute;text-shadow:0 0 40px rgba(180,120,255,0.2);letter-spacing:1px}
-.intro-text.visible{opacity:1}
-.intro-skip{position:absolute;bottom:30px;right:30px;z-index:110;cursor:pointer;color:rgba(255,255,255,0.3);font-size:12px;letter-spacing:3px;text-transform:uppercase;transition:all 0.3s;background:rgba(0,0,0,0.5);padding:12px 24px;border:1px solid rgba(255,255,255,0.1);border-radius:6px}
-.intro-skip:hover{color:#fff;border-color:#c9a84c;background:rgba(0,0,0,0.8)}
-#game-screen{padding:0;background:#000}
-#gameCanvas{display:block;position:absolute;top:0;left:0;width:100%;height:100%}
-.game-hud{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20}
-.hud-top{position:absolute;top:0;left:0;width:100%;padding:8px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:linear-gradient(180deg,rgba(0,0,0,0.7),transparent);pointer-events:auto}
-.hud-bar-group{display:flex;align-items:center;gap:4px;font-size:10px;color:#b8a0d0}
-.hud-bar{width:clamp(50px,8vw,120px);height:7px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;position:relative}
-.hud-bar-fill{height:100%;border-radius:4px;transition:width 0.25s ease}
-.hud-bar-fill.hp{background:linear-gradient(90deg,#cc2222,#ff4444)}
-.hud-bar-fill.mp{background:linear-gradient(90deg,#2255cc,#4488ff)}
-.hud-bar-fill.energy{background:linear-gradient(90deg,#6a2b8a,#aa44dd)}
-.hud-bar-fill.exp{background:linear-gradient(90deg,#8a6b2b,#c9a84c)}
-.hud-stat{font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:1px;margin-left:auto;pointer-events:auto}
-.hud-bottom{position:absolute;bottom:0;left:0;width:100%;padding:8px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;background:linear-gradient(0deg,rgba(0,0,0,0.5),transparent);pointer-events:auto}
-.hud-btn{background:rgba(106,43,138,0.2);border:1px solid rgba(201,168,76,0.15);color:#d0c0e0;padding:7px 12px;border-radius:4px;cursor:pointer;font-size:11px;letter-spacing:1px;text-transform:uppercase;transition:all 0.3s;font-family:inherit}
-.hud-btn:hover{background:rgba(106,43,138,0.5);border-color:#c9a84c;color:#fff}
-#bossBar{position:absolute;top:55px;left:50%;transform:translateX(-50%);z-index:25;display:none;background:rgba(0,0,0,0.85);border:1px solid rgba(255,68,0,0.4);border-radius:6px;padding:6px 14px;min-width:240px;text-align:center;pointer-events:auto}
-#bossBar .boss-name{color:#ff6644;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
-#bossBar .boss-hp-bg{width:100%;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden}
-#bossBar .boss-hp-fill{height:100%;background:linear-gradient(90deg,#cc2200,#ff4400);border-radius:4px;transition:width 0.3s ease}
-#combatTextContainer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:30}
-.combat-text{position:absolute;font-size:18px;font-weight:800;pointer-events:none;animation:ctFade 0.8s ease forwards;text-shadow:0 2px 8px rgba(0,0,0,0.8)}
-.combat-text.damage{color:#ff4444}
-.combat-text.critical{color:#ffd700;font-size:26px}
-.combat-text.heal{color:#44ff44}
-.combat-text.magic{color:#4488ff}
-@keyframes ctFade{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-50px) scale(1.2)}}
-#notif{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:300;display:none;flex-direction:column;align-items:center;gap:6px;background:rgba(0,0,0,0.9);border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:20px 35px;text-align:center;min-width:200px;backdrop-filter:blur(10px)}
-#notif.active{display:flex;animation:notifPop 0.4s ease}
-@keyframes notifPop{0%{opacity:0;transform:translate(-50%,-50%) scale(0.7)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-#notif .notif-icon{font-size:32px}
-#notif .notif-title{font-size:16px;color:#c9a84c;font-weight:700;letter-spacing:2px}
-#notif .notif-desc{font-size:11px;color:#b8a0d0;max-width:240px}
-.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:200;background:rgba(0,0,0,0.75);display:none;justify-content:center;align-items:center;backdrop-filter:blur(4px)}
-.modal-overlay.active{display:flex}
-.modal{background:linear-gradient(135deg,#1a0030,#0d0018);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:24px;max-width:90vw;max-height:85vh;overflow-y:auto;min-width:clamp(280px,45vw,560px);position:relative;animation:modalIn 0.3s ease}
-@keyframes modalIn{0%{opacity:0;transform:scale(0.9)}100%{opacity:1;transform:scale(1)}}
-.modal-close{position:absolute;top:6px;right:10px;background:none;border:none;color:rgba(255,255,255,0.3);font-size:20px;cursor:pointer;font-family:inherit;padding:4px 8px;line-height:1}
-.modal-close:hover{color:#fff}
-.modal h2{color:#c9a84c;text-align:center;letter-spacing:3px;text-transform:uppercase;font-size:17px;margin-bottom:12px}
-.modal h3{color:#b8a0d0;font-size:12px;letter-spacing:1px;margin:8px 0 4px;text-transform:uppercase}
-.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:5px;margin:8px 0;max-height:260px;overflow-y:auto}
-.inv-slot{background:rgba(106,43,138,0.08);border:1px solid rgba(201,168,76,0.08);border-radius:4px;padding:5px;text-align:center;cursor:pointer;transition:all 0.2s;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.inv-slot:hover{border-color:#c9a84c;background:rgba(106,43,138,0.2)}
-.inv-slot .slot-icon{font-size:20px}
-.inv-slot .slot-name{font-size:8px;color:#b8a0d0;margin-top:1px;overflow:hidden;text-overflow:ellipsis;max-width:50px;white-space:nowrap}
-.inv-slot .slot-count{font-size:8px;color:#c9a84c;font-weight:700}
-.inv-slot.selected{border-color:#c9a84c;background:rgba(201,168,76,0.12)}
-.inv-detail{background:rgba(0,0,0,0.3);border-radius:6px;padding:10px;margin:6px 0;display:none}
-.inv-detail h4{color:#c9a84c;font-size:13px}
-.inv-detail p{font-size:10px;color:#b8a0d0;margin:3px 0}
-.inv-detail .stats{font-size:9px;color:rgba(255,255,255,0.4)}
-.equip-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:6px 0}
-.equip-slot{background:rgba(106,43,138,0.08);border:1px solid rgba(201,168,76,0.08);border-radius:4px;padding:6px;text-align:center;min-height:42px;cursor:pointer;transition:all 0.2s}
-.equip-slot:hover{border-color:#c9a84c}
-.equip-slot .slot-label{font-size:7px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px}
-.equip-slot .slot-content{font-size:9px;color:#d0c0e0;margin-top:1px}
-.shop-cats{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-bottom:8px}
-.shop-cat{padding:5px 12px;background:rgba(106,43,138,0.12);border:1px solid rgba(201,168,76,0.1);border-radius:4px;cursor:pointer;font-size:9px;color:#b8a0d0;transition:all 0.2s;font-family:inherit}
-.shop-cat.active,.shop-cat:hover{border-color:#c9a84c;color:#fff;background:rgba(106,43,138,0.3)}
-.shop-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px}
-.shop-item{background:rgba(106,43,138,0.08);border:1px solid rgba(201,168,76,0.08);border-radius:5px;padding:8px;text-align:center;cursor:pointer;transition:all 0.2s}
-.shop-item:hover{border-color:#c9a84c;background:rgba(106,43,138,0.2)}
-.shop-item .si-icon{font-size:22px}
-.shop-item .si-name{font-size:10px;color:#d0c0e0;margin:2px 0}
-.shop-item .si-price{font-size:10px;color:#c9a84c}
-.shop-item .si-owned{font-size:8px;color:rgba(255,255,255,0.3)}
-.skill-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin:8px 0}
-.skill-card{background:rgba(106,43,138,0.08);border:1px solid rgba(201,168,76,0.08);border-radius:5px;padding:8px;text-align:center;cursor:pointer;transition:all 0.2s}
-.skill-card:hover{border-color:#c9a84c;background:rgba(106,43,138,0.2)}
-.skill-card.owned{border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.06)}
-.skill-card.maxed{border-color:#c9a84c;background:rgba(201,168,76,0.12)}
-.skill-card .sk-icon{font-size:20px}
-.skill-card .sk-name{font-size:10px;color:#d0c0e0}
-.skill-card .sk-lvl{font-size:8px;color:#c9a84c}
-.skill-card .sk-cost{font-size:8px;color:rgba(255,255,255,0.3)}
-.skill-card .sk-desc{font-size:8px;color:rgba(255,255,255,0.3);margin-top:1px}
-.quest-tabs{display:flex;gap:4px;margin-bottom:8px;justify-content:center}
-.quest-tab{padding:5px 12px;background:rgba(106,43,138,0.12);border:1px solid rgba(201,168,76,0.1);border-radius:4px;cursor:pointer;font-size:9px;color:#b8a0d0;transition:all 0.2s;font-family:inherit}
-.quest-tab.active,.quest-tab:hover{border-color:#c9a84c;color:#fff;background:rgba(106,43,138,0.3)}
-.quest-list{max-height:280px;overflow-y:auto}
-.quest-item{background:rgba(106,43,138,0.06);border:1px solid rgba(201,168,76,0.06);border-radius:5px;padding:10px;margin-bottom:5px;transition:all 0.2s}
-.quest-item.completed{border-color:rgba(68,255,68,0.15);background:rgba(68,255,68,0.04)}
-.quest-item .qi-title{font-size:11px;color:#d0c0e0;font-weight:700}
-.quest-item .qi-desc{font-size:9px;color:rgba(255,255,255,0.4);margin:2px 0}
-.quest-item .qi-progress{font-size:9px;color:#c9a84c}
-.quest-item .qi-reward{font-size:8px;color:rgba(201,168,76,0.4);margin-top:2px}
-#miniMap{position:absolute;bottom:55px;right:8px;width:100px;height:70px;background:rgba(0,0,0,0.5);border:1px solid rgba(201,168,76,0.12);border-radius:4px;z-index:25;pointer-events:none;overflow:hidden}
-.map-container{position:relative;width:100%;max-width:460px;margin:8px auto;aspect-ratio:16/9;background:rgba(0,0,0,0.3);border-radius:6px;overflow:hidden}
-.map-loc{position:absolute;padding:3px 6px;background:rgba(106,43,138,0.25);border:1px solid rgba(201,168,76,0.1);border-radius:3px;cursor:pointer;font-size:7px;color:#b8a0d0;transition:all 0.2s;text-align:center;min-width:50px;pointer-events:auto}
-.map-loc:hover{border-color:#c9a84c;color:#fff;background:rgba(106,43,138,0.45)}
-.map-loc.locked{opacity:0.25;cursor:not-allowed}
-.map-loc.current{border-color:#ffd700;color:#ffd700;background:rgba(201,168,76,0.2)}
-.map-title{font-size:9px;color:rgba(255,255,255,0.25);text-align:center;letter-spacing:1px;margin-bottom:4px}
-.setting-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);gap:10px}
-.setting-row label{font-size:11px;color:#b8a0d0}
-.setting-row input[type=range]{width:100px;accent-color:#c9a84c;height:4px}
-.setting-row select{background:rgba(106,43,138,0.2);border:1px solid rgba(201,168,76,0.2);color:#fff;padding:3px 6px;border-radius:4px;font-size:10px;font-family:inherit}
-.toggle-btn{background:rgba(106,43,138,0.15);border:1px solid rgba(201,168,76,0.1);color:#b8a0d0;padding:3px 10px;border-radius:3px;cursor:pointer;font-size:9px;transition:all 0.2s;font-family:inherit}
-.toggle-btn.active{border-color:#c9a84c;color:#fff;background:rgba(201,168,76,0.15)}
-.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:5px;margin:8px 0}
-.ach-card{background:rgba(106,43,138,0.06);border:1px solid rgba(201,168,76,0.06);border-radius:5px;padding:8px;text-align:center;transition:all 0.2s}
-.ach-card.unlocked{border-color:rgba(201,168,76,0.25);background:rgba(201,168,76,0.05)}
-.ach-card .ach-icon{font-size:22px}
-.ach-card .ach-name{font-size:9px;color:#d0c0e0;margin:2px 0}
-.ach-card .ach-desc{font-size:7px;color:rgba(255,255,255,0.3)}
-.ach-card.locked{opacity:0.45}
-.credit-section{text-align:center;margin:8px 0}
-.credit-section h3{font-size:11px;color:#c9a84c;letter-spacing:2px;margin-bottom:2px}
-.credit-section p{font-size:10px;color:#b8a0d0}
-.owner-card{text-align:center;max-width:380px;margin:12px auto}
-.owner-card .avatar{width:65px;height:65px;border-radius:50%;background:linear-gradient(135deg,#6a2b8a,#c9a84c);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 8px}
-.owner-card h2{color:#c9a84c;font-size:18px}
-.owner-card .title{color:#b8a0d0;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
-.owner-card p{font-size:10px;color:rgba(255,255,255,0.5);max-width:320px;margin:0 auto 8px;line-height:1.6}
-.owner-card .contact{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:6px}
-.owner-card .contact a{color:#c9a84c;font-size:10px;text-decoration:none;padding:5px 12px;border:1px solid rgba(201,168,76,0.2);border-radius:4px;transition:all 0.2s}
-.owner-card .contact a:hover{background:rgba(201,168,76,0.1)}
-.game-version{font-size:8px;color:rgba(255,255,255,0.12);letter-spacing:1px;margin-top:8px}
-@media(max-width:600px){
-.btn{min-width:130px;padding:9px 16px;font-size:11px;letter-spacing:1.5px}
-.hud-bar{width:40px}
-.hud-top{padding:5px 6px;gap:4px;font-size:9px}
-.modal{min-width:95vw;padding:14px}
-.inv-grid{grid-template-columns:repeat(auto-fill,minmax(48px,1fr))}
-.shop-items{grid-template-columns:repeat(auto-fill,minmax(90px,1fr))}
-.skill-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}
-#bossBar{min-width:180px}
-}
-</style>
+<title>ZEUS: NEON HEIST</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<canvas id="particleCanvas"></canvas>
+<!-- ===== PARTICLE / RAIN CANVAS BG ===== -->
+<canvas id="bgCanvas"></canvas>
 
-<div id="title-screen" class="screen active">
-  <div class="screen-bg"></div>
-  <div class="title-content">
-    <div class="title-glitch">⚔ A ZEUS PRODUCTION ⚔</div>
-    <h1 class="title-main">ZEUS SHADOW</h1>
-    <div class="title-divider"></div>
-    <div class="title-sub">Rise From Darkness</div>
-    <div class="title-dev">v1.0 · PHASE 1 COMPLETE</div>
-    <div class="btn-menu" style="margin-top:25px">
-      <button class="btn btn-gold" onclick="startNewGame()">▶ NEW GAME</button>
-      <button class="btn" id="btnContinue" onclick="continueGame()" style="display:none">⏵ CONTINUE</button>
-      <button class="btn" onclick="showScreen('load-screen');renderSaveList()">📂 LOAD SAVE</button>
-      <button class="btn" onclick="showScreen('settings-screen')">⚙ SETTINGS</button>
-      <button class="btn" onclick="showScreen('achievements-screen')">🏆 ACHIEVEMENTS</button>
-      <button class="btn" onclick="showScreen('credits-screen')">🎬 CREDITS</button>
-      <button class="btn" onclick="showScreen('owner-screen')">👤 OWNER</button>
-    </div>
+<!-- ===== LOADING SCREEN ===== -->
+<div id="loadingScreen" class="screen active">
+  <div class="loading-content">
+    <div class="loading-logo">ZEUS: NEON HEIST</div>
+    <div class="loading-bar-bg"><div class="loading-bar-fill" id="loadBar"></div></div>
+    <div class="loading-text" id="loadText">INITIALIZING SYSTEMS...</div>
   </div>
 </div>
 
-<div id="load-screen" class="screen"><div class="screen-bg"></div><div class="scroll-container"><h2 style="color:#c9a84c;letter-spacing:3px;margin-bottom:15px">📂 SAVE FILES</h2><div id="saveList" style="width:100%;max-width:400px;margin-bottom:15px"></div><button class="btn btn-sm" onclick="showScreen('title-screen')">← BACK</button></div></div>
-<div id="settings-screen" class="screen"><div class="screen-bg"></div><div class="scroll-container" style="max-width:480px"><h2 style="color:#c9a84c;letter-spacing:3px;margin-bottom:15px">⚙ SETTINGS</h2><div class="setting-row"><label>Music Volume</label><input type="range" id="s_musicVol" min="0" max="1" step="0.05" value="0.5" onchange="SET.music=+this.value;saveSettings()"></div><div class="setting-row"><label>SFX Volume</label><input type="range" id="s_sfxVol" min="0" max="1" step="0.05" value="0.7" onchange="SET.sfx=+this.value;saveSettings()"></div><div class="setting-row"><label>Particles</label><button class="toggle-btn active" id="s_particles" onclick="toggleSetting('particles')">ON</button></div><div class="setting-row"><label>Screen Shake</label><button class="toggle-btn active" id="s_shake" onclick="toggleSetting('shake')">ON</button></div><div class="setting-row"><label>Weather FX</label><button class="toggle-btn active" id="s_weather" onclick="toggleSetting('weather')">ON</button></div><div class="setting-row"><label>Fullscreen</label><button class="toggle-btn" id="s_fullscreen" onclick="toggleFullscreen()">OFF</button></div><div class="setting-row" style="border:none;margin-top:10px"><button class="btn btn-sm btn-danger" onclick="if(confirm('Reset ALL save data? This cannot be undone!')){localStorage.removeItem('zs_save');localStorage.removeItem('zs_settings');alert('Save data reset.');location.reload()}">🗑 Reset All Save Data</button></div><button class="btn btn-sm" onclick="showScreen('title-screen')" style="margin-top:8px">← BACK</button></div></div>
-<div id="achievements-screen" class="screen"><div class="screen-bg"></div><div class="scroll-container" style="max-width:480px"><h2 style="color:#c9a84c;letter-spacing:3px;margin-bottom:5px">🏆 ACHIEVEMENTS</h2><div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px;letter-spacing:1px" id="achCount">0 / 0 Unlocked</div><div id="achList" class="ach-grid"></div><button class="btn btn-sm" onclick="showScreen('title-screen')" style="margin-top:10px">← BACK</button></div></div>
-<div id="credits-screen" class="screen"><div class="screen-bg"></div><div class="scroll-container" style="max-width:420px"><h2 style="color:#c9a84c;letter-spacing:3px;margin-bottom:15px">🎬 CREDITS</h2><div class="credit-section"><h3>Game Designer</h3><p>ZEUS</p></div><div class="credit-section"><h3>Programming</h3><p>ZEUS</p></div><div class="credit-section"><h3>Story / UI Design</h3><p>ZEUS</p></div><div class="credit-section"><h3>Music</h3><p>ZEUS SHADOW Original Theme</p></div><div class="credit-section"><h3>Special Thanks</h3><p>Players ❤ · Supporters · Open Source Community</p></div><div class="game-version" style="margin-top:12px">ZEUS SHADOW v1.0 · Built with Vanilla JS</div><button class="btn btn-sm" onclick="showScreen('title-screen')" style="margin-top:10px">← BACK</button></div></div>
-<div id="owner-screen" class="screen"><div class="screen-bg"></div><div class="scroll-container"><div class="owner-card"><div class="avatar">⚡</div><h2>Godwin Emmanuel</h2><div class="title">ZEUS</div><p>Godwin Emmanuel is the creator of ZEUS and the developer behind ZEUS SHADOW. He is a passionate software creator and game developer focused on building innovative browser experiences, creative tools, and immersive entertainment projects. With a keen interest in creating polished digital products, he continuously works on improving his skills and projects, delivering high-quality interactive experiences to users worldwide.</p><div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:4px">📞 09066760078</div><div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:8px">✉ ge5853987@gmail.com</div><div class="contact"><a href="https://wa.me/2349066760078" target="_blank">💬 WhatsApp</a><a href="mailto:ge5853987@gmail.com">✉ Email</a></div></div><button class="btn btn-sm" onclick="showScreen('title-screen')" style="margin-top:10px">← BACK</button></div></div>
-
-<div id="intro-overlay">
-  <div class="intro-text" id="i0">The Shadow Kingdom has fallen...</div>
-  <div class="intro-text" id="i1">Dark creatures have overrun the land...</div>
-  <div class="intro-text" id="i2">Villages burn. Fortresses crumble. Hope fades.</div>
-  <div class="intro-text" id="i3">The Shadow King rules from his fortress of darkness.</div>
-  <div class="intro-text" id="i4">But legends speak of one who will rise...</div>
-  <div class="intro-text" id="i5">A warrior born from shadow, forged in flame.</div>
-  <div class="intro-text" id="i6">His name is ZEUS.</div>
-  <div class="intro-text" id="i7">He must travel across forests, ruins, mountains,</div>
-  <div class="intro-text" id="i8">castles, caves, deserts, frozen lands,</div>
-  <div class="intro-text" id="i9">and the Shadow Fortress itself.</div>
-  <div class="intro-text" id="i10">Only then can he face the Shadow King...</div>
-  <div class="intro-text" id="i11">and restore peace to the realm.</div>
-  <div class="intro-text" id="i12">The journey begins now.</div>
-  <div class="intro-skip" onclick="skipIntro()">SKIP ▶</div>
+<!-- ===== MAIN MENU ===== -->
+<div id="menuScreen" class="screen">
+  <div class="menu-bg"></div>
+  <div class="menu-content">
+    <div class="menu-glitch">// ZEUS SYSTEMS ONLINE //</div>
+    <h1 class="menu-title">ZEUS: NEON HEIST</h1>
+    <div class="menu-sub">███ CYBERPUNK ACTION ███</div>
+    <div class="menu-buttons" id="menuButtons">
+      <button class="menu-btn" onclick="startNewGame()">▶ NEW GAME</button>
+      <button class="menu-btn" id="contBtn" onclick="continueGame()" style="display:none">▶ CONTINUE</button>
+      <button class="menu-btn" onclick="showScreen('loadScreen')">📂 LOAD GAME</button>
+      <button class="menu-btn" onclick="showScreen('missionsScreen')">🎯 MISSIONS</button>
+      <button class="menu-btn" onclick="showScreen('settingsScreen')">⚙ SETTINGS</button>
+      <button class="menu-btn" onclick="showScreen('achieveScreen')">🏆 ACHIEVEMENTS</button>
+      <button class="menu-btn" onclick="showScreen('creditsScreen')">🎬 CREDITS</button>
+      <button class="menu-btn" onclick="showScreen('ownerScreen')">👤 ABOUT</button>
+      <button class="menu-btn menu-btn-danger" onclick="if(confirm('Exit game?'))window.close()">✕ EXIT</button>
+    </div>
+    <div class="menu-version">v1.0 · EMERGENCE</div>
+  </div>
 </div>
 
-<div id="game-screen" class="screen">
+<!-- ===== LOAD SCREEN ===== -->
+<div id="loadScreen" class="screen"><div class="screen-bg"></div><div class="scroll-cont"><h2 class="neon-title">📂 LOAD SAVE</h2><div id="saveList"></div><button class="menu-btn menu-btn-sm" onclick="showScreen('menuScreen')">← BACK</button></div></div>
+
+<!-- ===== MISSIONS SCREEN ===== -->
+<div id="missionsScreen" class="screen"><div class="screen-bg"></div><div class="scroll-cont"><h2 class="neon-title">🎯 MISSIONS</h2><div id="missionList" style="width:100%;max-width:500px;margin-bottom:15px"></div><button class="menu-btn menu-btn-sm" onclick="showScreen('menuScreen')">← BACK</button></div></div>
+
+<!-- ===== SETTINGS ===== -->
+<div id="settingsScreen" class="screen"><div class="screen-bg"></div><div class="scroll-cont" style="max-width:480px">
+  <h2 class="neon-title">⚙ SETTINGS</h2>
+  <div class="sett-row"><label>Music Volume</label><input type="range" id="s_music" min="0" max="1" step="0.05" value="0.5" onchange="updateSett()"></div>
+  <div class="sett-row"><label>SFX Volume</label><input type="range" id="s_sfx" min="0" max="1" step="0.05" value="0.7" onchange="updateSett()"></div>
+  <div class="sett-row"><label>Particles</label><button class="tog active" id="s_particles" onclick="tog('particles')">ON</button></div>
+  <div class="sett-row"><label>Screen Shake</label><button class="tog active" id="s_shake" onclick="tog('shake')">ON</button></div>
+  <div class="sett-row"><label>Weather FX</label><button class="tog active" id="s_weather" onclick="tog('weather')">ON</button></div>
+  <div class="sett-row"><label>Fullscreen</label><button class="tog" id="s_fs" onclick="toggleFS()">OFF</button></div>
+  <div class="sett-row" style="border:none;margin-top:10px"><button class="menu-btn menu-btn-sm menu-btn-danger" onclick="if(confirm('Reset ALL data?')){localStorage.clear();alert('Reset done.');location.reload()}">🗑 RESET DATA</button></div>
+  <button class="menu-btn menu-btn-sm" onclick="showScreen('menuScreen')" style="margin-top:8px">← BACK</button>
+</div></div>
+
+<!-- ===== ACHIEVEMENTS ===== -->
+<div id="achieveScreen" class="screen"><div class="screen-bg"></div><div class="scroll-cont" style="max-width:480px"><h2 class="neon-title">🏆 ACHIEVEMENTS</h2><div style="font-size:11px;color:var(--dim);margin-bottom:10px" id="achCount"></div><div id="achGrid" class="ach-grid"></div><button class="menu-btn menu-btn-sm" onclick="showScreen('menuScreen')">← BACK</button></div></div>
+
+<!-- ===== CREDITS ===== -->
+<div id="creditsScreen" class="screen"><div class="screen-bg"></div><div class="scroll-cont" style="max-width:450px"><h2 class="neon-title">🎬 CREDITS</h2><div class="cred-sec"><h3>Programming</h3><p>ZEUS</p></div><div class="cred-sec"><h3>Game Design</h3><p>ZEUS</p></div><div class="cred-sec"><h3>Story & UI</h3><p>ZEUS</p></div><div class="cred-sec"><h3>Music</h3><p>NEON HEIST Original Soundtrack</p></div><div class="cred-sec"><h3>Testing</h3><p>ZEUS Community</p></div><div class="game-ver">ZEUS: NEON HEIST v1.0</div><button class="menu-btn menu-btn-sm" onclick="showScreen('menuScreen')" style="margin-top:10px">← BACK</button></div></div>
+
+<!-- ===== OWNER / ABOUT ===== -->
+<div id="ownerScreen" class="screen"><div class="screen-bg"></div><div class="scroll-cont"><div class="owner-card"><div class="owner-avatar">⚡</div><h2 class="owner-name">Godwin Emmanuel</h2><div class="owner-brand">ZEUS</div><p class="owner-bio">Godwin Emmanuel is the creator of ZEUS and the visionary behind ZEUS: NEON HEIST. As a passionate software developer and game designer, he focuses on building immersive browser-based gaming experiences with premium design, engaging gameplay mechanics, and continuous innovation. ZEUS: NEON HEIST represents his commitment to delivering high-quality interactive entertainment that pushes the boundaries of what browser games can achieve.</p><div class="owner-contact"><span>📞 09066760078</span><span>✉ ge5853987@gmail.com</span></div><div class="owner-links"><a href="https://wa.me/2349066760078" target="_blank">💬 WhatsApp</a><a href="mailto:ge5853987@gmail.com">✉ Email</a></div></div><button class="menu-btn menu-btn-sm" onclick="showScreen('menuScreen')" style="margin-top:10px">← BACK</button></div></div>
+
+<!-- ===== INTRO OVERLAY ===== -->
+<div id="introOverlay">
+  <div class="intro-txt" id="it0">The year is 2099.</div>
+  <div class="intro-txt" id="it1">Mega corporations control the world through AI.</div>
+  <div class="intro-txt" id="it2">Cities are filled with surveillance drones.</div>
+  <div class="intro-txt" id="it3">Every citizen is monitored.</div>
+  <div class="intro-txt" id="it4">One elite hacker stands against them.</div>
+  <div class="intro-txt" id="it5">His codename is ZEUS.</div>
+  <div class="intro-txt" id="it6">Infiltrate corporations. Steal secret data.</div>
+  <div class="intro-txt" id="it7">Expose corruption. Save humanity.</div>
+  <div class="intro-txt" id="it8">The neon-lit rebellion begins now.</div>
+  <button class="intro-skip" onclick="skipIntro()">SKIP ▶</button>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="gameScreen" class="screen">
   <canvas id="gameCanvas"></canvas>
-  <div id="combatTextContainer"></div>
-  <div class="game-hud">
+  <div id="ctContainer"></div>
+  <div class="game-hud" id="gameHud">
     <div class="hud-top">
-      <div class="hud-bar-group">❤<div class="hud-bar"><div class="hud-bar-fill hp" id="hpBar" style="width:100%"></div></div><span id="hpText" style="font-size:9px;min-width:35px">100/100</span></div>
-      <div class="hud-bar-group">💠<div class="hud-bar"><div class="hud-bar-fill mp" id="mpBar" style="width:100%"></div></div><span id="mpText" style="font-size:9px;min-width:30px">50/50</span></div>
-      <div class="hud-bar-group">⚡<div class="hud-bar"><div class="hud-bar-fill energy" id="energyBar" style="width:100%"></div></div><span id="energyText" style="font-size:9px;min-width:35px">100/100</span></div>
-      <div class="hud-bar-group">⭐<div class="hud-bar"><div class="hud-bar-fill exp" id="expBar" style="width:0%"></div></div><span id="expText" style="font-size:9px;min-width:40px">0/100</span></div>
-      <span class="hud-stat" id="hudStats">Lv.1 · 💰0</span>
+      <div class="hud-hp"><span>❤</span><div class="hud-bg"><div class="hud-fill hp-f" id="hpBar"></div></div><span id="hpTxt" class="hud-num">100</span></div>
+      <div class="hud-hp"><span>🛡</span><div class="hud-bg"><div class="hud-fill arm-f" id="armBar" style="width:0%"></div></div><span id="armTxt" class="hud-num">0</span></div>
+      <div class="hud-hp"><span>⚡</span><div class="hud-bg"><div class="hud-fill ener-f" id="enerBar"></div></div><span id="enerTxt" class="hud-num">100</span></div>
+      <div class="hud-hp"><span>⭐</span><div class="hud-bg"><div class="hud-fill exp-f" id="expBar" style="width:0%"></div></div><span id="expTxt" class="hud-num">0/100</span></div>
+      <div class="hud-right"><span id="hudStats" style="font-size:10px;color:var(--cyan);letter-spacing:1px">Lv.1 · 💰0</span></div>
     </div>
-    <div id="bossBar"><div class="boss-name" id="bossName">👑 BOSS</div><div class="boss-hp-bg"><div class="boss-hp-fill" id="bossHpFill" style="width:100%"></div></div></div>
+    <div class="hud-mid" id="objDisplay" style="display:none">
+      <span id="objText" style="font-size:10px;color:var(--gold);letter-spacing:1px">OBJECTIVE: Hack the terminal</span>
+    </div>
+    <div id="bossBar" style="display:none"><div class="boss-name" id="bossName">BOSS</div><div class="boss-bg"><div class="boss-fill" id="bossFill"></div></div></div>
     <div class="hud-bottom">
-      <button class="hud-btn" onclick="togglePause()">⏸ PAUSE</button>
-      <button class="hud-btn" onclick="openInventory()">🎒 INV</button>
-      <button class="hud-btn" onclick="useHealthPotion()" style="min-width:auto;padding:7px 10px">❤ Potion</button>
-      <button class="hud-btn" onclick="useManaPotion()" style="min-width:auto;padding:7px 10px">💠 Potion</button>
+      <button class="hud-act" onclick="togglePause()" title="Pause [P]">⏸</button>
+      <button class="hud-act" onclick="openInv()" title="Inventory [I]">🎒</button>
+      <button class="hud-act" onclick="useHP()" title="Heal [1]">❤</button>
+      <button class="hud-act" onclick="useEP()" title="Energy [2]">⚡</button>
+      <button class="hud-act" onclick="enterHackMode()" title="Hack [H]">💻</button>
     </div>
     <canvas id="miniMap"></canvas>
   </div>
+  
+  <!-- Dialogue -->
+  <div id="dialogueBox" style="display:none;position:absolute;bottom:80px;left:50%;transform:translateX(-50%);z-index:35;background:rgba(5,0,20,0.93);border:1px solid var(--gold);border-radius:8px;padding:14px 18px;max-width:420px;width:90%;pointer-events:auto;animation:fadeInUp 0.3s">
+    <div id="diaSpeaker" style="color:var(--gold);font-size:12px;font-weight:700;margin-bottom:4px"></div>
+    <div id="diaText" style="color:#d0c0e0;font-size:12px;line-height:1.5"></div>
+    <div style="text-align:right;margin-top:6px;color:rgba(255,255,255,0.2);font-size:10px;cursor:pointer" onclick="this.parentElement.style.display='none'">▶ Close</div>
+  </div>
 </div>
 
-<div class="modal-overlay" id="pauseModal"><div class="modal" style="max-width:280px"><h2>⏸ PAUSED</h2><div style="display:flex;flex-direction:column;gap:5px;margin-bottom:4px"><button class="btn btn-sm btn-gold" onclick="togglePause()">▶ RESUME</button><button class="btn btn-sm" onclick="togglePause();openInventory()">🎒 INVENTORY</button><button class="btn btn-sm" onclick="togglePause();openSkillTree()">⭐ SKILL TREE</button><button class="btn btn-sm" onclick="togglePause();openQuests()">📜 QUESTS</button><button class="btn btn-sm" onclick="togglePause();openWorldMap()">🗺 MAP</button><button class="btn btn-sm" onclick="togglePause();showScreen('settings-screen')">⚙ SETTINGS</button><button class="btn btn-sm btn-gold" onclick="togglePause();saveGame()">💾 SAVE</button><button class="btn btn-sm btn-danger" onclick="if(confirm('Quit to menu? Unsaved progress will be lost.')){togglePause();stopGame()}">🚪 QUIT TO MENU</button></div><button class="modal-close" onclick="togglePause()">✕</button></div></div>
-
-<div class="modal-overlay" id="inventoryModal"><div class="modal"><h2>🎒 INVENTORY</h2><button class="modal-close" onclick="closeInventory()">✕</button><div style="display:flex;gap:12px;flex-wrap:wrap"><div style="flex:1;min-width:160px"><h3>Equipment</h3><div class="equip-grid"><div class="equip-slot" onclick="unequipItem('weapon')"><div class="slot-label">🗡 Weapon</div><div class="slot-content" id="eqweapon">Empty</div></div><div class="equip-slot" onclick="unequipItem('armor')"><div class="slot-label">🛡 Armor</div><div class="slot-content" id="eqarmor">Empty</div></div><div class="equip-slot" onclick="unequipItem('helmet')"><div class="slot-label">⛑ Helmet</div><div class="slot-content" id="eqhelmet">Empty</div></div><div class="equip-slot" onclick="unequipItem('ring')"><div class="slot-label">💍 Ring</div><div class="slot-content" id="eqring">Empty</div></div><div class="equip-slot" onclick="unequipItem('amulet')"><div class="slot-label">📿 Amulet</div><div class="slot-content" id="eqamulet">Empty</div></div><div class="equip-slot" onclick="unequipItem('boots')"><div class="slot-label">👢 Boots</div><div class="slot-content" id="eqboots">Empty</div></div></div></div><div style="flex:2;min-width:200px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><h3 style="margin:0">Items (<span id="invCount">0</span>)</h3><div style="display:flex;gap:3px"><button class="btn btn-sm" style="min-width:auto;padding:3px 8px;font-size:8px" onclick="sortInventory()">🔀 Sort</button><button class="btn btn-sm" style="min-width:auto;padding:3px 8px;font-size:8px" onclick="closeInventory();openShop()">🏪 Shop</button></div></div><div id="invGrid" class="inv-grid"></div><div id="invDetail" class="inv-detail"><h4 id="idName">Item</h4><p id="idDesc">Description</p><div class="stats" id="idStats">Stats</div><div style="display:flex;gap:4px;margin-top:4px"><button class="btn btn-sm" id="idUseBtn" onclick="useSelectedItem()" style="min-width:auto;padding:3px 8px;font-size:8px">Use</button><button class="btn btn-sm" id="idEquipBtn" onclick="equipSelected()" style="min-width:auto;padding:3px 8px;font-size:8px">Equip</button><button class="btn btn-sm btn-danger" onclick="dropSelected()" style="min-width:auto;padding:3px 8px;font-size:8px">Drop</button></div></div></div></div></div></div>
-
-<div class="modal-overlay" id="shopModal"><div class="modal"><h2>🏪 SHOP</h2><button class="modal-close" onclick="closeShop()">✕</button><div style="text-align:center;font-size:11px;color:#c9a84c;margin-bottom:6px">💰 Gold: <span id="shopGold">0</span></div><div class="shop-cats" id="shopCats"></div><div id="shopItems" class="shop-items"></div></div></div>
-<div class="modal-overlay" id="skillModal"><div class="modal"><h2>⭐ SKILL TREE</h2><button class="modal-close" onclick="closeSkillTree()">✕</button><div style="text-align:center;font-size:10px;color:#b8a0d0;margin-bottom:6px">Skill Points: <span id="skillPts">0</span></div><div id="skillGrid" class="skill-grid"></div></div></div>
-<div class="modal-overlay" id="questModal"><div class="modal"><h2>📜 QUESTS</h2><button class="modal-close" onclick="closeQuests()">✕</button><div class="quest-tabs"><button class="quest-tab active" onclick="switchQuestTab('main')">📖 Main</button><button class="quest-tab" onclick="switchQuestTab('side')">📋 Side</button><button class="quest-tab" onclick="switchQuestTab('daily')">🔄 Daily</button><button class="quest-tab" onclick="switchQuestTab('completed')">✅ Done</button></div><div id="questList" class="quest-list"></div></div></div>
-<div class="modal-overlay" id="mapModal"><div class="modal" style="max-width:520px"><h2>🗺 WORLD MAP</h2><button class="modal-close" onclick="closeWorldMap()">✕</button><div class="map-title">Click a location to travel (unlocked areas only)</div><div class="map-container" id="mapContainer"></div></div></div>
-
-<div id="notif"><div class="notif-icon" id="notifIcon">⚔</div><div class="notif-title" id="notifTitle">Notification</div><div class="notif-desc" id="notifDesc"></div></div>
-
-<script>
-// ============================================================
-// ZEUS SHADOW — COMPLETE GAME ENGINE
-// ============================================================
-
-// ----- SETTINGS -----
-const SET = JSON.parse(localStorage.getItem('zs_settings')) || { music:0.5, sfx:0.7, particles:true, shake:true, weather:true };
-function saveSettings(){ localStorage.setItem('zs_settings', JSON.stringify(SET)) }
-function toggleSetting(k){
-  SET[k]=!SET[k];
-  const el=document.getElementById('s_'+k);
-  if(el){el.textContent=SET[k]?'ON':'OFF';el.classList.toggle('active',SET[k])}
-  saveSettings();
-  if(k==='weather'&&GS.state==='playing'){setupWeather(GS.curWeather||'clear')}
-}
-function toggleFullscreen(){
-  if(!document.fullscreenElement){document.documentElement.requestFullscreen().catch(e=>{})}
-  else{document.exitFullscreen()}
-  const el=document.getElementById('s_fullscreen');
-  if(el){el.textContent=document.fullscreenElement?'ON':'OFF';el.classList.toggle('active',!!document.fullscreenElement)}
-}
-
-// ----- PARTICLES BG -----
-const PC=document.getElementById('particleCanvas'), PCTX=PC.getContext('2d');
-let bP=[];
-function resizeP(){PC.width=innerWidth;PC.height=innerHeight}
-window.addEventListener('resize',resizeP);resizeP();
-function initBP(n=60){
-  bP=[];for(let i=0;i<n;i++)bP.push({x:Math.random()*PC.width,y:Math.random()*PC.height,vx:(Math.random()-0.5)*0.2,vy:(Math.random()-0.5)*0.2-0.08,s:Math.random()*2+1,a:Math.random()*0.3+0.05,p:Math.random()*6.28})
-}
-function updateBP(){bP.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.p+=0.02;if(p.x<0)p.x=PC.width;if(p.x>PC.width)p.x=0;if(p.y<0)p.y=PC.height;if(p.y>PC.height)p.y=0})}
-function drawBP(){
-  if(!SET.particles)return;
-  PCTX.clearRect(0,0,PC.width,PC.height);
-  bP.forEach(p=>{
-    const a=p.a*(0.5+0.5*Math.sin(p.p));
-    PCTX.beginPath();PCTX.arc(p.x,p.y,p.s,0,6.28);
-    PCTX.fillStyle=`rgba(180,130,255,${a})`;PCTX.fill();
-  });
-}
-initBP();
-
-// ----- AUDIO -----
-let AC=null;
-function initA(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)()}
-function playSFX(name){
-  if(!SET.sfx)return;
-  try{
-    initA();
-    const m={hit:[180,0.08,'square',0.06],slash:[350,0.1,'sawtooth',0.07],magic:[550,0.2,'sine',0.06],bow:[700,0.12,'sine',0.05],coin:[1000,0.08,'sine',0.06],levelup:[440,0.35,'sine',0.08],death:[120,0.4,'sawtooth',0.07],block:[280,0.05,'square',0.04],heal:[600,0.2,'sine',0.06],dash:[800,0.06,'sine',0.04],click:[650,0.04,'sine',0.03]}[name];
-    if(!m)return;
-    const o=AC.createOscillator(),g=AC.createGain();
-    o.type=m[2];o.frequency.value=m[0];
-    g.gain.setValueAtTime(m[3]*SET.sfx,AC.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+m[1]);
-    o.connect(g);g.connect(AC.destination);
-    o.start();o.stop(AC.currentTime+m[1]);
-  }catch(e){}
-}
-
-// ----- GAME STATE -----
-const GS = {
-  state:'menu', player:null, enemies:[], projectiles:[], particles:[], npcs:[],
-  platforms:[], ladders:[], decorations:[], water:[],
-  cam:{x:0,y:0}, world:{w:4000,h:600}, curMap:'forest', curWeather:'clear',
-  enemiesDefeated:{}, boss:null, bossFight:false,
-  keys:{}, lastTime:0, delta:0, gameTime:0, fps:0, fc:0, fpsT:0,
-  loop:false, paused:false,
-  inventory:[], equipment:{}, skills:{}, stats:{kills:0,bosses:0,deaths:0,gold:0,shadowKills:0},
-  achievements:{}, quests:[], unlockedMaps:['forest'], completedBosses:[],
-  selectedSlot:-1, shopTab:'potion', questTab:'main', autoSaveT:0
-};
-
-// ----- ITEMS DATABASE -----
-const ITEMS = {
-  health_potion:{name:'Health Potion',icon:'❤',desc:'Restore 30 HP',type:'consumable',price:15,effect:(p)=>{p.hp=Math.min(p.maxHP,p.hp+30);showNotif('❤','+30 HP');updateHUD();playSFX('heal')}},
-  mana_potion:{name:'Mana Potion',icon:'💠',desc:'Restore 20 MP',type:'consumable',price:12,effect:(p)=>{p.mp=Math.min(p.maxMP,p.mp+20);showNotif('💠','+20 MP');updateHUD();playSFX('heal')}},
-  energy_potion:{name:'Energy Potion',icon:'⚡',desc:'Restore 40 Energy',type:'consumable',price:18,effect:(p)=>{p.energy=Math.min(p.maxEnergy,p.energy+40);updateHUD();playSFX('heal')}},
-  shadow_essence:{name:'Shadow Essence',icon:'🔮',desc:'Dark energy fragment',type:'material',price:25},
-  gold_ore:{name:'Gold Ore',icon:'⛏',desc:'Shiny gold ore',type:'material',price:8},
-  magic_crystal:{name:'Magic Crystal',icon:'💎',desc:'Crackling with power',type:'material',price:30},
-  dragon_scale:{name:'Dragon Scale',icon:'🐉',desc:'Rare dragon scale',type:'material',price:50},
-  wooden_sword:{name:'Wooden Sword',icon:'🗡',desc:'Basic wooden blade',type:'weapon',price:30,atk:3,slot:'weapon'},
-  iron_sword:{name:'Iron Sword',icon:'🗡',desc:'Reliable iron blade',type:'weapon',price:80,atk:7,slot:'weapon'},
-  shadow_blade:{name:'Shadow Blade',icon:'🗡',desc:'A blade of pure darkness',type:'weapon',price:200,atk:14,slot:'weapon'},
-  zeus_blade:{name:'ZEUS Blade',icon:'🗡',desc:'The legendary blade',type:'weapon',price:500,atk:25,slot:'weapon'},
-  leather_armor:{name:'Leather Armor',icon:'🛡',desc:'Light leather protection',type:'armor',price:40,def:3,slot:'armor'},
-  iron_armor:{name:'Iron Armor',icon:'🛡',desc:'Sturdy iron plate',type:'armor',price:100,def:7,slot:'armor'},
-  shadow_armor:{name:'Shadow Armor',icon:'🛡',desc:'Armor woven from darkness',type:'armor',price:250,def:14,slot:'armor'},
-  leather_helmet:{name:'Leather Helmet',icon:'⛑',desc:'Basic head protection',type:'helmet',price:25,def:2,slot:'helmet'},
-  iron_helmet:{name:'Iron Helmet',icon:'⛑',desc:'Strong head protection',type:'helmet',price:60,def:5,slot:'helmet'},
-  shadow_crown:{name:'Shadow Crown',icon:'⛑',desc:'Crown of dark power',type:'helmet',price:180,def:10,slot:'helmet'},
-  copper_ring:{name:'Copper Ring',icon:'💍',desc:'Minor power ring',type:'ring',price:20,atk:1,slot:'ring'},
-  silver_ring:{name:'Silver Ring',icon:'💍',desc:'Shiny silver band',type:'ring',price:55,atk:2,def:2,slot:'ring'},
-  shadow_ring:{name:'Shadow Ring',icon:'💍',desc:'Ancient dark ring',type:'ring',price:150,atk:5,def:3,slot:'ring'},
-  chain_amulet:{name:'Chain Amulet',icon:'📿',desc:'Simple charm',type:'amulet',price:30,def:2,slot:'amulet'},
-  crystal_amulet:{name:'Crystal Amulet',icon:'📿',desc:'Enchanted charm',type:'amulet',price:75,def:4,mag:3,slot:'amulet'},
-  shadow_amulet:{name:'Shadow Amulet',icon:'📿',desc:'Dark power charm',type:'amulet',price:200,def:6,mag:6,slot:'amulet'},
-  leather_boots:{name:'Leather Boots',icon:'👢',desc:'Simple travel boots',type:'boots',price:20,def:1,slot:'boots'},
-  iron_boots:{name:'Iron Boots',icon:'👢',desc:'Sturdy combat boots',type:'boots',price:50,def:3,slot:'boots'},
-  shadow_boots:{name:'Shadow Boots',icon:'👢',desc:'Boots of darkness',type:'boots',price:140,def:5,slot:'boots'},
-};
-
-// ----- SHOP CATEGORIES -----
-const SHOP_CATS = {
-  potion:['health_potion','mana_potion','energy_potion'],
-  weapon:['wooden_sword','iron_sword','shadow_blade','zeus_blade'],
-  armor:['leather_armor','iron_armor','shadow_armor'],
-  helmet:['leather_helmet','iron_helmet','shadow_crown'],
-  accessory:['copper_ring','silver_ring','shadow_ring','chain_amulet','crystal_amulet','shadow_amulet','leather_boots','iron_boots','shadow_boots']
-};
-
-// ----- SKILLS -----
-const SKILLS = {
-  power_strike:{name:'Power Strike',icon:'⚔',desc:'+5% ATK per level',max:5,cost:1,f:l=>1+l*0.05},
-  iron_wall:{name:'Iron Wall',icon:'🛡',desc:'+5% DEF per level',max:5,cost:1,f:l=>1+l*0.05},
-  mana_flow:{name:'Mana Flow',icon:'💠',desc:'+10% MP regen per level',max:5,cost:1,f:l=>1+l*0.1},
-  shadow_strike:{name:'Shadow Strike',icon:'🌑',desc:'+2% crit per level',max:5,cost:2,f:l=>l*0.02},
-  vitality:{name:'Vitality',icon:'❤',desc:'+15 max HP per level',max:5,cost:1,f:l=>l*15},
-  arcane_power:{name:'Arcane Power',icon:'🔮',desc:'+5% magic per level',max:5,cost:2,f:l=>1+l*0.05},
-  wind_walker:{name:'Wind Walker',icon:'💨',desc:'+3% speed per level',max:5,cost:2,f:l=>1+l*0.03}
-};
-
-// ----- ACHIEVEMENTS -----
-const ACH = [
-  {id:'first_kill',name:'First Blood',icon:'⚔',desc:'Kill first enemy'},//checked differently
-  {id:'slayer10',name:'Slayer',icon:'🗡',desc:'Kill 10 enemies'},
-  {id:'slayer50',name:'Butcher',icon:'⚔',desc:'Kill 50 enemies'},
-  {id:'boss1',name:'Boss Slayer',icon:'👑',desc:'Defeat first boss'},
-  {id:'boss3',name:'King Slayer',icon:'👑',desc:'Defeat 3 bosses'},
-  {id:'gold100',name:'Treasure Hunter',icon:'💰',desc:'Collect 100 gold'},
-  {id:'gold500',name:'Rich',icon:'💰',desc:'Collect 500 gold'},
-  {id:'level5',name:'Warrior',icon:'⭐',desc:'Reach level 5'},
-  {id:'level10',name:'Master',icon:'🏆',desc:'Reach level 10'},
-  {id:'items25',name:'Collector',icon:'📦',desc:'Collect 25 items'},
-  {id:'death5',name:'Persistent',icon:'💀',desc:'Die 5 times'},
-];
-
-// ----- QUESTS -----
-const QDB = [
-  {id:'q1',name:'The Awakening',type:'main',desc:'Defeat 5 Skeletons',obj:'kill',targ:'skeleton',cnt:5,prog:0,rew:{exp:50,gold:30},done:false},
-  {id:'q2',name:'Forest Threat',type:'main',desc:'Defeat the Forest Boss',obj:'boss',targ:'forest_boss',cnt:1,prog:0,rew:{exp:200,gold:100,item:'magic_crystal'},done:false},
-  {id:'q3',name:'Reach the Mountains',type:'main',desc:'Travel to Snow Mountain',obj:'reach',targ:'snow_mountain',cnt:1,prog:0,rew:{exp:100,gold:50},done:false},
-  {id:'q4',name:'Frozen Menace',type:'main',desc:'Defeat the Frozen King',obj:'boss',targ:'ice_monster',cnt:1,prog:0,rew:{exp:300,gold:150,item:'shadow_essence'},done:false},
-  {id:'q5',name:'Dragon Slayer',type:'main',desc:'Defeat the Shadow Dragon',obj:'boss',targ:'dragon',cnt:1,prog:0,rew:{exp:500,gold:300,item:'dragon_scale'},done:false},
-  {id:'q6',name:'Final Stand',type:'main',desc:'Defeat the Shadow King!',obj:'boss',targ:'shadow_king',cnt:1,prog:0,rew:{exp:1000,gold:500,item:'zeus_blade'},done:false},
-  {id:'s1',name:'Goblin Problem',type:'side',desc:'Defeat 10 Goblins',obj:'kill',targ:'goblin',cnt:10,prog:0,rew:{exp:40,gold:25},done:false},
-  {id:'s2',name:'Cleanse the Cemetery',type:'side',desc:'Defeat 10 Ghosts',obj:'kill',targ:'ghost',cnt:10,prog:0,rew:{exp:60,gold:40},done:false},
-  {id:'d1',name:'Daily Training',type:'daily',desc:'Kill 20 enemies',obj:'kill_any',targ:'any',cnt:20,prog:0,rew:{exp:30,gold:15},done:false},
-];
-
-// ----- MAPS -----
-const MAPS = {
-  forest:{name:'Forest',icon:'🌳',bg:'#1a2e1a',gnd:'#2a4a2a',w:'clear',enemies:['skeleton','goblin','wolf'],boss:'forest_boss',next:['dark_forest','village'],pos:{x:30,y:55}},
-  dark_forest:{name:'Dark Forest',icon:'🌲',bg:'#0a1a0a',gnd:'#1a2a1a',w:'fog',enemies:['skeleton','zombie','ghost','spider'],next:['snow_mountain','haunted_cemetery'],pos:{x:18,y:38}},
-  snow_mountain:{name:'Snow Mountain',icon:'🏔',bg:'#3a4a6a',gnd:'#4a5a7a',w:'snow',enemies:['wolf','ice_monster'],boss:'ice_monster',next:['frozen_lake','cave'],pos:{x:42,y:18}},
-  volcano:{name:'Volcano',icon:'🌋',bg:'#3a1a0a',gnd:'#4a2a1a',w:'clear',enemies:['fire_monster','demon'],boss:'dragon',next:['ancient_temple'],pos:{x:75,y:12}},
-  village:{name:'Village',icon:'🏘',bg:'#2a3a2a',gnd:'#3a4a3a',w:'clear',enemies:[],next:['haunted_cemetery','castle'],pos:{x:55,y:70}},
-  castle:{name:'Castle',icon:'🏰',bg:'#2a2a3a',gnd:'#3a3a4a',w:'clear',enemies:['dark_knight','mage'],next:['dungeon'],pos:{x:72,y:55}},
-  dungeon:{name:'Dungeon',icon:'⛓',bg:'#050505',gnd:'#111',w:'clear',enemies:['zombie','spider','poison_creature'],next:['underground_mine'],pos:{x:85,y:45}},
-  underground_mine:{name:'Mine',icon:'⛏',bg:'#050505',gnd:'#111',w:'clear',enemies:['goblin','spider'],next:['ancient_temple'],pos:{x:80,y:62}},
-  ancient_temple:{name:'Ancient Temple',icon:'🏛',bg:'#1a1a2a',gnd:'#2a2a3a',w:'clear',enemies:['ghost','mage','dark_knight'],next:['sky_islands'],pos:{x:60,y:28}},
-  haunted_cemetery:{name:'Haunted Cemetery',icon:'⚰',bg:'#1a1a1a',gnd:'#2a1a1a',w:'fog',enemies:['ghost','zombie','skeleton'],boss:'necromancer',next:['shadow_realm'],pos:{x:35,y:50}},
-  frozen_lake:{name:'Frozen Lake',icon:'🧊',bg:'#4a5a7a',gnd:'#5a6a8a',w:'snow',enemies:['wolf','ice_monster'],next:['sky_islands'],pos:{x:28,y:12}},
-  cave:{name:'Cave',icon:'🕳',bg:'#0a0a0a',gnd:'#1a1a1a',w:'clear',enemies:['spider','poison_creature','goblin'],next:['underground_mine'],pos:{x:50,y:8}},
-  sky_islands:{name:'Sky Islands',icon:'☁',bg:'#3a4a6a',gnd:'#4a5a7a',w:'clear',enemies:['flying_monster','mage'],next:['shadow_realm'],pos:{x:45,y:5}},
-  shadow_realm:{name:'Shadow Realm',icon:'🌑',bg:'#0a0010',gnd:'#150020',w:'fog',enemies:['demon','shadow_beast','dark_knight'],boss:'shadow_king',next:['final_fortress'],pos:{x:15,y:25}},
-  final_fortress:{name:'Final Fortress',icon:'🏯',bg:'#1a0a0a',gnd:'#2a1a1a',w:'clear',enemies:['dark_knight','demon','shadow_beast'],next:[],pos:{x:5,y:15}},
-};
-
-const ENEMY_TYPES = {
-  skeleton:{name:'Skeleton',icon:'💀',hp:20,atk:4,def:1,spd:1.5,exp:12,gold:5,c:'#8a8a8a',s:28},
-  zombie:{name:'Zombie',icon:'🧟',hp:30,atk:3,def:2,spd:1,exp:10,gold:3,c:'#6a8a4a',s:28},
-  goblin:{name:'Goblin',icon:'👺',hp:15,atk:5,def:0,spd:2.5,exp:8,gold:4,c:'#7a8a3a',s:24},
-  wolf:{name:'Wolf',icon:'🐺',hp:18,atk:6,def:0,spd:3,exp:12,gold:4,c:'#6a6a6a',s:26},
-  spider:{name:'Spider',icon:'🕷',hp:12,atk:7,def:0,spd:2.2,exp:7,gold:2,c:'#4a3a2a',s:22},
-  ghost:{name:'Ghost',icon:'👻',hp:25,atk:8,def:0,spd:2,exp:18,gold:6,c:'#aab',s:26,ghost:true},
-  mage:{name:'Dark Mage',icon:'🧙',hp:35,atk:12,def:2,spd:1.5,exp:22,gold:10,c:'#6a2b8a',s:28,ranged:true},
-  dark_knight:{name:'Dark Knight',icon:'⚔',hp:60,atk:15,def:8,spd:2,exp:35,gold:20,c:'#3a1a4a',s:32},
-  ice_monster:{name:'Ice Monster',icon:'❄',hp:80,atk:18,def:10,spd:1.5,exp:55,gold:28,c:'#8ab',s:36},
-  fire_monster:{name:'Fire Monster',icon:'🔥',hp:70,atk:20,def:5,spd:2,exp:50,gold:22,c:'#b84a1a',s:34},
-  poison_creature:{name:'Poison Creature',icon:'☠',hp:40,atk:10,def:3,spd:2.2,exp:28,gold:10,c:'#5a8a3a',s:28},
-  demon:{name:'Demon',icon:'👿',hp:90,atk:22,def:8,spd:2.5,exp:65,gold:35,c:'#6a1a1a',s:34},
-  shadow_beast:{name:'Shadow Beast',icon:'🐲',hp:100,atk:25,def:10,spd:3,exp:75,gold:40,c:'#2a1a4a',s:38},
-  flying_monster:{name:'Flying Horror',icon:'🦇',hp:30,atk:10,def:2,spd:3.5,exp:22,gold:8,c:'#5a3a5a',s:24,flying:true},
-};
-
-const BOSS_TYPES = {
-  forest_boss:{name:'Forest Titan',icon:'🌳',hp:200,atk:14,def:5,exp:200,gold:100,phases:2,drops:['shadow_essence','magic_crystal'],s:48},
-  ice_monster:{name:'Frozen King',icon:'❄',hp:360,atk:18,def:10,exp:300,gold:150,phases:2,drops:['magic_crystal','shadow_essence'],s:52},
-  dragon:{name:'Shadow Dragon',icon:'🐉',hp:500,atk:28,def:14,exp:500,gold:300,phases:3,drops:['dragon_scale','shadow_blade'],s:60},
-  necromancer:{name:'Necromancer Lord',icon:'💀',hp:300,atk:22,def:8,exp:350,gold:200,phases:2,drops:['shadow_essence','magic_crystal'],s:44},
-  shadow_king:{name:'Shadow King',icon:'👑',hp:800,atk:38,def:18,exp:1000,gold:500,phases:3,drops:['zeus_blade','dragon_scale'],s:56},
-};
-
-// ----- PLAYER FACTORY -----
-function createPlayer(){
-  return {
-    x:100,y:200,w:26,h:36,vx:0,vy:0,
-    speed:3.8,runSpeed:7,jumpPow:-10.5,
-    maxHP:100,hp:100,maxMP:50,mp:50,maxEnergy:100,energy:100,
-    mpRegen:0.15,engRegen:0.3,
-    lvl:1,exp:0,expNext:100,gold:0,
-    baseAtk:5,baseDef:3,baseMag:3,
-    str:5,def:3,mag:3,spd:3,luck:1,
-    critChance:0.05,critDmg:1.5,
-    onGround:false,jumping:false,canDJ:false,
-    dashing:false,dashT:0,dashCD:0,
-    attacking:false,atkT:0,atkCombo:0,
-    blocking:false,invincible:0,
-    facing:1,animF:0,animT:0,animS:'idle',
-    statPts:0,skillPts:0
-  };
-}
-
-// ----- NOTIFICATION -----
-let notifTimer=null;
-function showNotif(icon,title,desc=''){
-  const n=document.getElementById('notif');
-  document.getElementById('notifIcon').textContent=icon;
-  document.getElementById('notifTitle').textContent=title;
-  document.getElementById('notifDesc').textContent=desc;
-  n.classList.add('active');
-  clearTimeout(notifTimer);
-  notifTimer=setTimeout(()=>n.classList.remove('active'),2000);
-}
-function closeNotif(){document.getElementById('notif').classList.remove('active');clearTimeout(notifTimer)}
-
-// ----- SCREEN MGMT -----
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const el=document.getElementById(id);
-  if(el){el.classList.add('active')}
-}
-
-// ----- SAVE / LOAD -----
-function saveGame(){
-  if(!GS.player)return;
-  const d={
-    p:GS.player,m:GS.curMap,t:GS.gameTime,
-    a:GS.achievements,q:GS.quests,i:GS.inventory,
-    e:GS.equipment,sk:GS.skills,um:GS.unlockedMaps,
-    cb:GS.completedBosses,st:GS.stats,
-    g:GS.player.gold
-  };
-  localStorage.setItem('zs_save',JSON.stringify(d));
-  showNotif('💾','Game Saved!');playSFX('click');
-}
-
-function loadSaveData(){try{const r=localStorage.getItem('zs_save');return r?JSON.parse(r):null}catch(e){return null}}
-
-function renderSaveList(){
-  const d=loadSaveData();
-  const el=document.getElementById('saveList');
-  if(!d||!d.p){el.innerHTML='<div style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:20px">No save files found.</div>';return}
-  const p=d.p;const m=MAPS[d.m];
-  el.innerHTML=`<div style="background:rgba(106,43,138,0.1);border:1px solid rgba(201,168,76,0.15);border-radius:6px;padding:14px;text-align:center;cursor:pointer" onclick="loadSaveSlot()"><div style="font-size:14px;color:#c9a84c;font-weight:700">⚔ Level ${p.lvl} Warrior</div><div style="font-size:11px;color:#b8a0d0;margin:4px 0">${m?m.icon+' '+m.name:'Unknown'} · 💰 ${d.g||0} gold</div><div style="font-size:9px;color:rgba(255,255,255,0.3)">Kills: ${d.st?.kills||0} · Bosses: ${d.st?.bosses||0} · Playtime: ${Math.floor((d.t||0)/60)}m</div><button class="btn btn-sm" style="margin-top:8px;min-width:100px">📂 Load This Save</button></div>`;
-}
-
-function loadSaveSlot(){
-  const d=loadSaveData();
-  if(!d){showNotif('⚠','No save found');return}
-  GS.player=d.p;GS.curMap=d.m||'forest';GS.gameTime=d.t||0;
-  GS.achievements=d.a||{};GS.quests=d.q||JSON.parse(JSON.stringify(QDB));
-  GS.inventory=d.i||[];GS.equipment=d.e||{};GS.skills=d.sk||{};
-  GS.unlockedMaps=d.um||['forest'];GS.completedBosses=d.cb||[];
-  GS.stats=d.st||{kills:0,bosses:0,deaths:0,gold:0,shadowKills:0};
-  if(d.g!==undefined&&GS.player)GS.player.gold=d.g;
-  startGameplay();
-}
-
-// ----- GAME FLOW -----
-function startNewGame(){
-  initA();GS.player=createPlayer();
-  GS.inventory=[{id:'health_potion',count:3},{id:'mana_potion',count:2}];
-  GS.equipment={};GS.skills={};GS.unlockedMaps=['forest'];GS.curMap='forest';
-  GS.quests=JSON.parse(JSON.stringify(QDB));
-  GS.achievements={};GS.stats={kills:0,bosses:0,deaths:0,gold:0,shadowKills:0};
-  GS.completedBosses=[];GS.gameTime=0;GS.autoSaveT=0;
-  GS.enemiesDefeated={};
-  startIntro();
-}
-
-function continueGame(){
-  const d=loadSaveData();
-  if(!d){showNotif('⚠','No save found. Start a new game.');return}
-  loadSaveSlot();
-}
-
-function startIntro(){
-  GS.state='intro';
-  document.getElementById('intro-overlay').classList.add('active');
-  document.querySelectorAll('.intro-text').forEach(t=>t.classList.remove('visible'));
-  introIdx=0;showIntroNext();
-}
-let introIdx=0,introTimer=null;
-function showIntroNext(){
-  if(introIdx>=13){doneIntro();return}
-  document.querySelectorAll('.intro-text').forEach(t=>t.classList.remove('visible'));
-  const el=document.getElementById('i'+introIdx);
-  if(el){el.classList.add('visible');introIdx++;introTimer=setTimeout(showIntroNext,2000)}
-  else doneIntro();
-}
-function skipIntro(){clearTimeout(introTimer);doneIntro()}
-function doneIntro(){
-  document.getElementById('intro-overlay').classList.remove('active');
-  startGameplay();
-}
-
-function startGameplay(){
-  showScreen('game-screen');GS.state='playing';GS.paused=false;
-  GS.keys={};loadMap(GS.curMap);updateHUD();
-  GS.loop=true;GS.lastTime=performance.now();
-  requestAnimationFrame(gameLoop);
-}
-
-function stopGame(){
-  GS.loop=false;GS.state='menu';GS.paused=false;
-  showScreen('title-screen');
-  // check for continue button
-  const cb=document.getElementById('btnContinue');
-  const d=loadSaveData();
-  cb.style.display=d?'block':'none';
-}
-
-// ----- MAP LOADING -----
-function loadMap(id){
-  const m=MAPS[id];if(!m)return;
-  GS.curMap=id;GS.curWeather=m.w;GS.bossFight=false;GS.boss=null;
-  GS.enemies=[];GS.projectiles=[];GS.particles=[];
-  GS.platforms=[];GS.ladders=[];GS.water=[];GS.decorations=[];GS.npcs=[];
-  document.getElementById('bossBar').style.display='none';
-  
-  setupWeather(m.w);
-  const W=4000,H=600;
-  GS.world={w:W,h:H};GS.cam={x:0,y:0};
-  
-  // Ground platforms
-  for(let x=0;x<W;x+=120)GS.platforms.push({x,y:H-35,w:120,h:35});
-  // Floating platforms
-  for(let i=0;i<10+Math.random()*8;i++){
-    const px=180+Math.random()*(W-360),py=120+Math.random()*(H-200);
-    GS.platforms.push({x:px,y:py,w:60+Math.random()*100,h:12});
-  }
-  // Ladders
-  for(let i=0;i<3+Math.floor(Math.random()*3);i++){
-    const lx=200+Math.random()*(W-400);
-    GS.ladders.push({x:lx,y:60,w:16,h:H-100});
-  }
-  
-  // Enemies
-  if(m.enemies&&m.enemies.length>0){
-    const cnt=5+Math.floor(Math.random()*5);
-    for(let i=0;i<cnt;i++){
-      const t=m.enemies[Math.floor(Math.random()*m.enemies.length)];
-      spawnEnemy(t,180+Math.random()*(W-360));
-    }
-  }
-  // Boss
-  if(m.boss&&!GS.completedBosses.includes(m.boss))spawnBoss(m.boss);
-  
-  // NPCs in village
-  if(id==='village'){
-    spawnNPC('Elder','Welcome, warrior. The darkness spreads. Only you can stop it.',420,GS.world.h-65);
-    spawnNPC('Merchant','I have fine wares — check the shop!',750,GS.world.h-65);
-    spawnNPC('Guard','Stay sharp. Strange creatures near the forest.',1050,GS.world.h-65);
-  }
-  
-  // Decorations
-  for(let i=0;i<20;i++)GS.decorations.push({x:Math.random()*W,y:Math.random()*(H-70),type:Math.random()>0.5?'tree':'rock',s:12+Math.random()*30});
-  
-  const P=GS.player;
-  if(P){P.x=120;P.y=GS.world.h-80;P.vx=0;P.vy=0;P.invincible=0}
-  
-  // Update quest progress for reach
-  GS.quests.forEach(q=>{if(q.obj==='reach'&&q.targ===id&&!q.done){q.prog=Math.min(q.cnt,q.prog+1);if(q.prog>=q.cnt){q.done=true;claimQuestReward(q)}}});
-}
-
-function spawnEnemy(type,x){
-  const d=ENEMY_TYPES[type];if(!d)return;
-  GS.enemies.push({
-    ...d,type,x,y:0,w:d.s||26,h:d.s||26,
-    maxHp:d.hp,hp:d.hp,speed:(d.spd||1.5)*(0.9+Math.random()*0.2),
-    dir:Math.random()>0.5?1:-1,vx:0,vy:0,
-    aggro:160+Math.random()*60,atkCD:0,
-    state:'idle',patrolX:x,patrolR:60+Math.random()*60,
-    alive:true,hitF:0,animF:0,animT:0
-  });
-  const e=GS.enemies[GS.enemies.length-1];
-  e.y=GS.world.h-40-e.h;
-}
-
-function spawnBoss(id){
-  const d=BOSS_TYPES[id];if(!d)return;
-  GS.boss={...d,bossId:id,x:GS.world.w-300,y:0,w:d.s||48,h:(d.s||48)+10,
-    hp:d.hp,maxHp:d.hp,phase:1,maxPhases:d.phases||2,speed:1.8,
-    dir:-1,atkCD:0,state:'idle',alive:true,hitF:0,enraged:false};
-  GS.boss.y=GS.world.h-80-GS.boss.h;
-  GS.bossFight=true;
-  document.getElementById('bossBar').style.display='block';
-  document.getElementById('bossName').textContent='👑 '+d.name;
-  document.getElementById('bossHpFill').style.width='100%';
-}
-
-function spawnNPC(name,dia,x,y){
-  GS.npcs.push({name,dia,x,y,w:20,h:34});
-}
-
-// ----- WEATHER -----
-function setupWeather(type){
-  const c=document.getElementById('weatherContainer')||createWeatherContainer();
-  c.innerHTML='';
-  if(!SET.weather||type==='clear')return;
-  if(type==='rain')for(let i=0;i<40;i++){const d=document.createElement('div');d.style.cssText=`position:absolute;width:1px;height:30px;background:linear-gradient(transparent,rgba(180,200,255,0.12));left:${Math.random()*100}%;animation:rainFall ${0.3+Math.random()*0.3}s linear infinite;animation-delay:${Math.random()*2}s`;c.appendChild(d)}
-  else if(type==='snow'||type==='fog')for(let i=0;i<30;i++){const d=document.createElement('div');d.style.cssText=`position:absolute;width:2px;height:2px;background:rgba(255,255,255,0.5);border-radius:50%;left:${Math.random()*100}%;animation:snowFall ${2+Math.random()*3}s linear infinite;animation-delay:${Math.random()*4}s`;c.appendChild(d)}
-}
-function createWeatherContainer(){
-  const c=document.createElement('div');c.id='weatherContainer';
-  c.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:hidden';
-  document.body.appendChild(c);
-  const s=document.createElement('style');
-  s.textContent='@keyframes rainFall{0%{transform:translateY(-10vh)}100%{transform:translateY(110vh)}}@keyframes snowFall{0%{transform:translateY(-10vh) rotate(0deg)}100%{transform:translateY(110vh) rotate(360deg)}}';
-  document.head.appendChild(s);
-  return c;
-}
-
-// ----- RECT COLLISION -----
-function rectInt(x1,y1,w1,h1,x2,y2,w2,h2){return x1<x2+w2&&x1+w1>x2&&y1<y2+h2&&y1+h1>y2}
-
-// ----- CANVAS SETUP -----
-const CV=document.getElementById('gameCanvas'),CX=CV.getContext('2d');
-function resizeCV(){CV.width=window.innerWidth;CV.height=window.innerHeight}
-window.addEventListener('resize',resizeCV);resizeCV();
-
-// ----- INPUT -----
-document.addEventListener('keydown',e=>{
-  GS.keys[e.key.toLowerCase()]=true;GS.keys[e.key]=true;
-  if(e.key===' '||e.key==='ArrowUp'||e.key==='w')e.preventDefault();
-  if(GS.state==='playing'){
-    if(e.key==='i'||e.key==='I')openInventory();
-    if(e.key==='p'||e.key==='P')togglePause();
-    if(e.key==='e'||e.key==='E')interact();
-    if(e.key==='1')useHealthPotion();
-    if(e.key==='2')useManaPotion();
-  }
-});
-document.addEventListener('keyup',e=>{GS.keys[e.key.toLowerCase()]=false;GS.keys[e.key]=false});
-
-// ----- GAME LOOP -----
-function gameLoop(time){
-  if(!GS.loop||GS.state==='menu')return;
-  const dt=Math.min((time-GS.lastTime)/1000,0.05);
-  GS.lastTime=time;GS.delta=dt;GS.gameTime+=dt;GS.fc++;
-  if(time-GS.fpsT>1000){GS.fps=GS.fc;GS.fc=0;GS.fpsT=time}
-  
-  if(!GS.paused&&GS.state==='playing'){
-    updatePlayer(dt);
-    updateEnemies(dt);
-    updateBoss(dt);
-    updateProjectiles(dt);
-    updateCamera();
-    GS.autoSaveT+=dt;
-    if(GS.autoSaveT>30){GS.autoSaveT=0;autoSave()}
-  }
-  updateBP();
-  drawGame();
-  drawBP();
-  requestAnimationFrame(gameLoop);
-}
-
-function autoSave(){if(GS.state==='playing')saveGame()}
-
-function togglePause(){
-  GS.paused=!GS.paused;
-  document.getElementById('pauseModal').classList.toggle('active',GS.paused);
-}
-
-// ----- PLAYER UPDATE -----
-function updatePlayer(dt){
-  const P=GS.player;if(!P)return;
-  
-  // Regen
-  let mpM=1;if(GS.skills.mana_flow)mpM+=GS.skills.mana_flow*0.1;
-  P.mp=Math.min(P.maxMP,P.mp+P.mpRegen*dt*10*mpM);
-  P.energy=Math.min(P.maxEnergy,P.energy+P.engRegen*dt*10);
-  if(P.invincible>0)P.invincible-=dt;
-  if(P.dashT>0)P.dashT-=dt;else P.dashing=false;
-  if(P.dashCD>0)P.dashCD-=dt;
-  if(P.atkT>0)P.atkT-=dt;else{P.attacking=false;P.atkCombo=0}
-  
-  const L=GS.keys['arrowleft']||GS.keys['a'],R=GS.keys['arrowright']||GS.keys['d'],
-        U=GS.keys['arrowup']||GS.keys['w'],D=GS.keys['arrowdown']||GS.keys['s'],
-        J=GS.keys[' ']||GS.keys['ArrowUp']||GS.keys['w'];
-  
-  let spd=P.speed;
-  if(GS.equipment.boots){const b=ITEMS[GS.equipment.boots];if(b&&b.spd)spd+=b.spd}
-  if(GS.skills.wind_walker)spd*=GS.skills.wind_walker*0.03+1;
-  if(GS.keys['shift'])spd=P.runSpeed;
-  
-  // Ladder/water
-  let onLadder=false;GS.ladders.forEach(l=>{if(rectInt(P.x,P.y,P.w,P.h,l.x,l.y,l.w,l.h))onLadder=true});
-  let inWater=false;GS.water.forEach(w=>{if(rectInt(P.x,P.y+P.h-4,P.w,4,w.x,w.y,w.w,w.h))inWater=true});
-  
-  if(onLadder&&(U||D)){P.climbing=true;P.vy=U?-3.5:3.5;P.vx*=0.8}
-  else{P.climbing=false;
-    if(inWater){P.swimming=true;if(U)P.vy=-2;else if(D)P.vy=2;else P.vy*=0.9;P.vx*=0.9}
-    else{P.swimming=false;
-      if(!P.attacking&&!P.dashing){
-        if(L){P.vx=-spd;P.facing=-1}else if(R){P.vx=spd;P.facing=1}else P.vx*=0.8
-      }
-      // Jump
-      if(J&&P.onGround&&!P._jumpHeld){P.vy=P.jumpPow;P._jumpHeld=true;P.canDJ=true;playSFX('dash')}
-      else if(J&&P.canDJ&&!P.onGround&&P._jumpHeld){P.vy=P.jumpPow*0.85;P.canDJ=false;playSFX('dash')}
-      if(!J)P._jumpHeld=false;
-      P.vy+=26*dt;
-    }
-  }
-  
-  // Dash
-  if(GS.keys['v']&&P.dashCD<=0&&!P.dashing&&P.energy>=10){
-    P.dashing=true;P.dashT=0.25;P.dashCD=0.7;P.energy-=10;P.invincible=0.3;playSFX('dash');
-  }
-  if(P.dashing){P.dashT=0.25;P.vx=P.facing*15;P.invincible=0.3}
-  
-  // Block
-  P.blocking=GS.keys['b']&&!P.attacking&&P.onGround;
-  
-  // Attack
-  if(GS.keys['z']&&!P.attacking&&!P.blocking){
-    P.attacking=true;P.atkT=0.3+((P.atkCombo||0)*0.07);P.atkCombo=(P.atkCombo||0)%3+1;
-    playSFX('slash');
-    // Hit detection
-    const bx={x:P.x+(P.facing>0?P.w:-16),y:P.y+2,w:24,h:P.h-4};
-    let dmg=P.baseAtk;
-    if(GS.equipment.weapon){const wi=ITEMS[GS.equipment.weapon];if(wi&&wi.atk)dmg+=wi.atk}
-    if(GS.equipment.ring){const ri=ITEMS[GS.equipment.ring];if(ri&&ri.atk)dmg+=ri.atk}
-    if(GS.skills.power_strike)dmg*=1+GS.skills.power_strike*0.05;
-    dmg=Math.floor(dmg);
-    
-    GS.enemies.forEach(e=>{
-      if(!e.alive||e.hitF>0)return;
-      if(rectInt(bx.x,bx.y,bx.w,bx.h,e.x,e.y,e.w,e.h)){
-        let crit=Math.random()<(P.critChance+(GS.skills.shadow_strike?GS.skills.shadow_strike*0.02:0));
-        let d=dmg;if(crit)d=Math.floor(d*P.critDmg);
-        damageEnemy(e,d,crit);
-      }
-    });
-    if(GS.boss&&GS.boss.alive&&rectInt(bx.x,bx.y,bx.w,bx.h,GS.boss.x,GS.boss.y,GS.boss.w,GS.boss.h)){
-      let crit=Math.random()<(P.critChance+(GS.skills.shadow_strike?GS.skills.shadow_strike*0.02:0));
-      let d=dmg;if(crit)d=Math.floor(d*P.critDmg);
-      damageBoss(d,crit);
-    }
-  }
-  
-  // Magic
-  if(GS.keys['x']&&!P.attacking&&P.mp>=8){
-    P.mp-=8;P.attacking=true;P.atkT=0.35;
-    let dmg=P.baseAtk+P.baseMag*2;
-    if(GS.equipment.amulet){const ai=ITEMS[GS.equipment.amulet];if(ai&&ai.mag)dmg+=ai.mag*2}
-    if(GS.skills.arcane_power)dmg*=1+GS.skills.arcane_power*0.05;
-    dmg=Math.floor(dmg);
-    GS.projectiles.push({x:P.x+P.facing*26,y:P.y+10,vx:P.facing*8,vy:0,w:8,h:8,dmg,type:'magic',c:'#4488ff',life:2,fromP:true});
-    playSFX('magic');
-  }
-  
-  // Physics
-  P.x+=P.vx;P.y+=P.vy;
-  P.onGround=false;
-  
-  // Platform collision
-  GS.platforms.forEach(pl=>{
-    if(!rectInt(P.x,P.y,P.w,P.h,pl.x,pl.y,pl.w,pl.h))return;
-    if(P.vy>0&&P.y+P.h-P.vy<=pl.y+8){P.y=pl.y-P.h;P.vy=0;P.onGround=true}
-    else if(P.vy<0&&P.y-P.vy>=pl.y+pl.h-6){P.y=pl.y+pl.h;P.vy=0}
-    else if(P.vx>0&&P.x+P.w-P.vx<=pl.x+4)P.x=pl.x-P.w;
-    else if(P.vx<0&&P.x-P.vx>=pl.x+pl.w-4)P.x=pl.x+pl.w;
-  });
-  
-  // Boundaries
-  if(P.x<0)P.x=0;if(P.x>GS.world.w-P.w)P.x=GS.world.w-P.w;
-  if(P.y>GS.world.h-P.h){P.y=GS.world.h-P.h;P.vy=0;P.onGround=true}
-  
-  // Enemy collision damage
-  if(P.invincible<=0){
-    GS.enemies.forEach(e=>{
-      if(!e.alive)return;
-      if(rectInt(P.x,P.y,P.w,P.h,e.x,e.y,e.w,e.h)){
-        if(P.blocking){playSFX('block');P.energy=Math.min(P.maxEnergy,P.energy+5)}
-        else{const dm=Math.max(1,e.atk-Math.floor(P.baseDef/2));takeDamage(dm)}
-        P.invincible=0.5;
-      }
-    });
-    if(GS.boss&&GS.boss.alive&&rectInt(P.x,P.y,P.w,P.h,GS.boss.x,GS.boss.y,GS.boss.w,GS.boss.h)){
-      if(P.blocking){playSFX('block');P.energy=Math.min(P.maxEnergy,P.energy+5)}
-      else{const dm=Math.max(1,GS.boss.atk-Math.floor(P.baseDef/2));takeDamage(dm)}
-      P.invincible=0.5;
-    }
-  }
-  
-  // Death
-  if(P.hp<=0){P.hp=P.maxHP;P.mp=P.maxMP;P.energy=P.maxEnergy;P.x=120;P.y=GS.world.h-80;P.vx=0;P.vy=0;
-    GS.stats.deaths=(GS.stats.deaths||0)+1;showNotif('💀','You perished...','But rise again!');playSFX('death');updateHUD()}
-  
-  // Anim
-  if(P.attacking)P.animS='attack';
-  else if(P.dashing)P.animS='dash';
-  else if(Math.abs(P.vx)>1.5)P.animS='run';
-  else if(!P.onGround)P.animS='jump';
-  else P.animS='idle';
-  P.animT+=dt;if(P.animT>0.1){P.animT=0;P.animF=(P.animF+1)%4}
-}
-
-function takeDamage(dmg){
-  const P=GS.player;if(!P||P.invincible>0)return;
-  P.hp-=dmg;P.invincible=0.4;
-  combatText(P.x+P.w/2,P.y-10,'-'+dmg,'damage');
-  playSFX('hit');updateHUD();
-  if(SET.shake)screenShake(4,0.15);
-}
-
-function combatText(x,y,text,type='damage'){
-  const c=document.getElementById('combatTextContainer');
-  const el=document.createElement('div');
-  el.className='combat-text '+type;
-  el.textContent=text;
-  el.style.left=(x-GS.cam.x)+'px';
-  el.style.top=(y-GS.cam.y)+'px';
-  c.appendChild(el);
-  setTimeout(()=>el.remove(),800);
-}
-
-let sShakeX=0,sShakeY=0,sShakeI=0,sShakeT=0;
-function screenShake(i,t){sShakeI=i;sShakeT=t}
-function updateShake(dt){if(sShakeT>0){sShakeT-=dt;if(SET.shake){sShakeX=(Math.random()-0.5)*sShakeI;sShakeY=(Math.random()-0.5)*sShakeI}else{sShakeX=0;sShakeY=0}}else{sShakeX=0;sShakeY=0}}
-
-function damageEnemy(e,dmg,crit){
-  e.hp-=dmg;e.hitF=0.12;
-  combatText(e.x+e.w/2,e.y-10,(crit?'⚡':'')+'-'+dmg,crit?'critical':'damage');
-  playSFX('hit');
-  if(e.hp<=0){
-    e.alive=false;
-    const P=GS.player;
-    P.exp+=e.exp;P.gold+=e.gold;GS.stats.gold=(GS.stats.gold||0)+e.gold;
-    GS.stats.kills=(GS.stats.kills||0)+1;
-    if(e.type==='demon'||e.type==='shadow_beast')GS.stats.shadowKills=(GS.stats.shadowKills||0)+1;
-    if(Math.random()<0.15){const dr=['health_potion','mana_potion','gold_ore','shadow_essence'];addItem(dr[Math.floor(Math.random()*dr.length)])}
-    checkLevelUp();updateHUD();playSFX('coin');
-    updateQuestKill(e.type);
-    checkAchievements();
-  }
-}
-
-function damageBoss(dmg,crit){
-  const b=GS.boss;if(!b||!b.alive)return;
-  b.hp-=dmg;b.hitF=0.12;
-  combatText(b.x+b.w/2,b.y-18,(crit?'⚡':'')+'-'+dmg,crit?'critical':'damage');
-  playSFX('hit');
-  const pct=b.hp/b.maxHp;
-  const prevP=b.phase;
-  b.phase=b.maxPhases-Math.floor(pct*b.maxPhases);
-  if(b.phase<1)b.phase=1;
-  if(b.phase!==prevP&&b.phase>=2){
-    showNotif('⚠',b.name+' enrages!','Phase '+b.phase);b.speed*=1.15;b.atk*=1.2;b.enraged=true;
-    if(SET.shake)screenShake(8,0.3);
-  }
-  updateBossHP();
-  if(b.hp<=0){
-    b.alive=false;
-    const P=GS.player;
-    P.exp+=b.exp;P.gold+=b.gold;GS.stats.gold=(GS.stats.gold||0)+b.gold;
-    GS.stats.bosses=(GS.stats.bosses||0)+1;
-    GS.completedBosses.push(b.bossId);
-    if(b.drops)b.drops.forEach(item=>addItem(item));
-    const m=MAPS[GS.curMap];
-    if(m.next)m.next.forEach(mid=>{if(!GS.unlockedMaps.includes(mid))GS.unlockedMaps.push(mid)});
-    updateQuestBoss(b.bossId);
-    checkLevelUp();updateHUD();
-    document.getElementById('bossBar').style.display='none';GS.bossFight=false;
-    showNotif('👑','Victory!',b.name+' has been defeated!');
-    playSFX('levelup');
-    if(SET.shake)screenShake(12,0.4);
-    checkAchievements();
-  }
-}
-
-function updateBossHP(){
-  const b=GS.boss;if(!b)return;
-  document.getElementById('bossHpFill').style.width=Math.max(0,(b.hp/b.maxHp)*100)+'%';
-}
-
-function checkLevelUp(){
-  const P=GS.player;
-  while(P.exp>=P.expNext){
-    P.exp-=P.expNext;P.lvl++;P.expNext=Math.floor(100*Math.pow(1.14,P.lvl));
-    P.maxHP+=12;P.hp=P.maxHP;P.maxMP+=5;P.mp=P.maxMP;
-    P.baseAtk+=1;P.baseDef+=1;P.baseMag+=1;
-    P.statPts=(P.statPts||0)+3;P.skillPts=(P.skillPts||0)+1;
-    showNotif('⭐','LEVEL UP!','You are now Level '+P.lvl+'!');
-    playSFX('levelup');updateHUD();
-    checkAchievements();
-  }
-}
-
-// ----- ENEMY AI -----
-function updateEnemies(dt){
-  const P=GS.player;if(!P)return;
-  GS.enemies.forEach(e=>{
-    if(!e.alive)return;
-    if(e.hitF>0)e.hitF-=dt;
-    const dx=P.x-e.x,dy=P.y-e.y,dist=Math.sqrt(dx*dx+dy*dy);
-    if(dist<e.aggro&&dist>15){e.state='chase';e.dir=dx>0?1:-1;e.vx=e.dir*e.speed;if(e.y<GS.world.h-120&&Math.random()<0.015)e.vy=-7}
-    else{e.state='patrol';const pd=e.x-e.patrolX;if(Math.abs(pd)>e.patrolR)e.dir*=-1;e.vx=e.dir*e.speed*0.3}
-    e.atkCD-=dt;
-    if(dist<40&&e.atkCD<=0){e.atkCD=1.2;if(P.invincible<=0){const dm=Math.max(1,e.atk-Math.floor(P.baseDef/2));takeDamage(dm)}}
-    if(e.ranged&&dist<300&&dist>70&&e.atkCD<=0){
-      e.atkCD=2.5;
-      GS.projectiles.push({x:e.x+e.dir*16,y:e.y+6,vx:e.dir*5,vy:0,w:6,h:6,dmg:e.atk,type:'e_magic',c:'#8a2be2',life:3,fromP:false});
-    }
-    e.vy+=20*dt;e.x+=e.vx*dt*60;e.y+=e.vy*dt*60;
-    if(e.y>GS.world.h-40-e.h){e.y=GS.world.h-40-e.h;e.vy=0}
-    GS.platforms.forEach(pl=>{if(rectInt(e.x,e.y,e.w,e.h,pl.x,pl.y,pl.w,pl.h)){if(e.vy>0&&e.y+e.h-e.vy<=pl.y+4){e.y=pl.y-e.h;e.vy=0}}});
-    if(e.x<0)e.x=0;if(e.x>GS.world.w-e.w)e.x=GS.world.w-e.w;
-    if(e.flying)e.vy=Math.sin(GS.gameTime*2+e.x)*1.2;
-    e.animT+=dt;if(e.animT>0.15){e.animT=0;e.animF=(e.animF||0)%4+1}
-  });
-  GS.enemies=GS.enemies.filter(e=>e.alive||e.hitF>0);
-}
-
-// ----- BOSS AI -----
-function updateBoss(dt){
-  const b=GS.boss;if(!b||!b.alive)return;
-  const P=GS.player;if(!P)return;
-  if(b.hitF>0)b.hitF-=dt;
-  const dx=P.x-b.x,dist=Math.sqrt(dx*dx+Math.pow(P.y-b.y,2));
-  b.dir=dx>0?1:-1;b.atkCD-=dt;
-  if(b.phase>=2&&dist>80)b.vx=b.dir*b.speed*1.2;else if(dist>120)b.vx=b.dir*b.speed;else b.vx*=0.85;
-  b.atkCD-=dt;
-  if(b.atkCD<=0){
-    if(b.phase>=3&&Math.random()<0.2){
-      b.atkCD=3;if(SET.shake)screenShake(10,0.3);
-      for(let i=0;i<6;i++){const a=6.28/6*i;GS.projectiles.push({x:b.x+b.w/2,y:b.y+b.h/2,vx:Math.cos(a)*5,vy:Math.sin(a)*5,w:8,h:8,dmg:Math.floor(b.atk*1.3),type:'b_magic',c:'#ff4400',life:2.5,fromP:false})}
-      showNotif('⚠',b.name+' uses ULTIMATE!');
-    }else if(b.phase>=2&&Math.random()<0.3){
-      b.atkCD=2;b.vx=b.dir*12;
-    }else{b.atkCD=1.5;if(dist<80&&P.invincible<=0){const dm=Math.max(1,b.atk-Math.floor(P.baseDef/2));takeDamage(dm)}}
-  }
-  b.vy+=20*dt;b.x+=b.vx*dt*60;b.y+=b.vy*dt*60;
-  if(b.y>GS.world.h-80-b.h){b.y=GS.world.h-80-b.h;b.vy=0}
-  if(b.x<60)b.x=60;if(b.x>GS.world.w-60-b.w)b.x=GS.world.w-60-b.w;
-}
-
-// ----- PROJECTILES -----
-function updateProjectiles(dt){
-  GS.projectiles.forEach(p=>{
-    p.x+=p.vx;p.y+=p.vy;p.life-=dt;
-    if(!p.fromP){
-      const P=GS.player;
-      if(P&&P.invincible<=0&&rectInt(p.x,p.y,p.w,p.h,P.x,P.y,P.w,P.h)){
-        takeDamage(Math.max(1,(p.dmg||5)-Math.floor(P.baseDef/3)));p.life=-1
-      }
-    }
-    if(p.fromP){
-      GS.enemies.forEach(e=>{if(e.alive&&rectInt(p.x,p.y,p.w,p.h,e.x,e.y,e.w,e.h)){damageEnemy(e,Math.floor(p.dmg),false);p.life=-1}});
-      if(GS.boss&&GS.boss.alive&&rectInt(p.x,p.y,p.w,p.h,GS.boss.x,GS.boss.y,GS.boss.w,GS.boss.h)){damageBoss(Math.floor(p.dmg),false);p.life=-1}
-    }
-    if(p.x<-20||p.x>GS.world.w+20||p.y<-20||p.y>GS.world.h+20)p.life=-1;
-  });
-  GS.projectiles=GS.projectiles.filter(p=>p.life>0);
-}
-
-// ----- CAMERA -----
-function updateCamera(){
-  const P=GS.player;if(!P)return;
-  const tx=P.x-CV.width*0.35,ty=P.y-CV.height*0.45;
-  GS.cam.x+=(tx-GS.cam.x)*0.08;GS.cam.y+=(ty-GS.cam.y)*0.08;
-  GS.cam.x=Math.max(0,Math.min(GS.cam.x,GS.world.w-CV.width));
-  GS.cam.y=Math.max(0,Math.min(GS.cam.y,GS.world.h-CV.height));
-}
-
-// ----- RENDERING -----
-function drawGame(){
-  const P=GS.player;if(!P)return;
-  updateShake(GS.delta);
-  
-  CX.clearRect(0,0,CV.width,CV.height);
-  CX.save();
-  CX.translate(-GS.cam.x+sShakeX,-GS.cam.y+sShakeY);
-  
-  const m=MAPS[GS.curMap];
-  // Background
-  CX.fillStyle=m?m.bg:'#0a0015';
-  CX.fillRect(GS.cam.x-100,0,CV.width+200,GS.world.h);
-  const gr=CX.createLinearGradient(0,0,0,GS.world.h);
-  gr.addColorStop(0,'rgba(0,0,0,0.3)');
-  gr.addColorStop(0.5,'rgba(20,0,40,0.15)');
-  gr.addColorStop(1,'rgba(0,0,0,0.25)');
-  CX.fillStyle=gr;
-  CX.fillRect(GS.cam.x-100,0,CV.width+200,GS.world.h);
-  
-  // Decorations (parallax)
-  CX.globalAlpha=0.2;
-  GS.decorations.forEach(d=>{
-    if(d.x<GS.cam.x-140||d.x>GS.cam.x+CV.width+140)return;
-    const dx=d.x*0.5-GS.cam.x*0.5+GS.cam.x;
-    CX.fillStyle=d.type==='tree'?'#1a3a1a':'#3a3a3a';
-    if(d.type==='tree'){CX.fillRect(dx,d.y-d.s-10,5,d.s+10);CX.beginPath();CX.arc(dx+2.5,d.y-d.s-10,d.s/2+2,0,6.28);CX.fillStyle='#1a4a1a';CX.fill()}
-    else CX.fillRect(dx,d.y-d.s/2,d.s,d.s/2);
-  });
-  CX.globalAlpha=1;
-  
-  // Platforms
-  CX.fillStyle=m?m.gnd:'#2a2a3a';
-  GS.platforms.forEach(p=>{
-    CX.fillRect(p.x,p.y,p.w,p.h);
-    CX.fillStyle='rgba(255,255,255,0.03)';CX.fillRect(p.x,p.y,p.w,1.5);
-    CX.fillStyle=m?m.gnd:'#2a2a3a';
-  });
-  
-  // Ladders
-  GS.ladders.forEach(l=>{
-    CX.fillStyle='rgba(139,90,43,0.2)';CX.fillRect(l.x,l.y,l.w,l.h);
-    for(let y=l.y;y<l.y+l.h;y+=16){CX.fillStyle='rgba(201,168,76,0.1)';CX.fillRect(l.x,y,l.w,1.5)}
-  });
-  
-  // Water
-  GS.water.forEach(w=>{CX.fillStyle='rgba(30,60,120,0.3)';CX.fillRect(w.x,w.y,w.w,w.h);CX.fillStyle='rgba(100,180,255,0.06)';CX.fillRect(w.x,w.y,w.w,1.5)});
-  
-  // NPCs
-  GS.npcs.forEach(n=>{
-    CX.fillStyle='#4a3a5a';CX.fillRect(n.x,n.y-n.h,n.w,n.h);
-    CX.fillStyle='#d4a574';CX.fillRect(n.x+2,n.y-n.h+2,n.w-4,6);
-    CX.fillStyle='#c9a84c';CX.font='8px sans-serif';CX.textAlign='center';
-    CX.fillText(n.name,n.x+n.w/2,n.y-n.h-4);
-  });
-  
-  // Enemies
-  GS.enemies.forEach(e=>{
-    if(!e.alive)return;
-    CX.fillStyle='rgba(0,0,0,0.2)';
-    CX.beginPath();CX.ellipse(e.x+e.w/2,e.y+e.h+3,e.w/2,3,0,0,6.28);CX.fill();
-    CX.fillStyle=e.hitF>0?'#fff':e.c||'#888';
-    CX.fillRect(e.x,e.y,e.w,e.h);
-    CX.fillStyle='rgba(255,0,0,0.7)';const ew=4,eh=4;
-    CX.fillRect(e.x+e.w*0.15,e.y+eh*2,ew,eh);CX.fillRect(e.x+e.w*0.7,e.y+eh*2,ew,eh);
-    // HP bar
-    if(e.hp<e.maxHp){
-      CX.fillStyle='rgba(0,0,0,0.5)';CX.fillRect(e.x,e.y-6,e.w,3);
-      CX.fillStyle=e.hp/e.maxHp>0.5?'#44aa44':e.hp/e.maxHp>0.25?'#aaaa44':'#cc3333';
-      CX.fillRect(e.x,e.y-6,e.w*(e.hp/e.maxHp),3);
-    }
-    CX.font='11px sans-serif';CX.textAlign='center';
-    CX.fillText(e.icon||'?',e.x+e.w/2,e.y+e.h/2+3);
-  });
-  
-  // Boss
-  if(GS.boss&&GS.boss.alive){
-    const b=GS.boss;
-    CX.fillStyle=b.hitF>0?'#fff':'#4a0a1a';
-    CX.shadowColor='rgba(255,0,0,0.2)';CX.shadowBlur=12;
-    CX.fillRect(b.x,b.y,b.w,b.h);CX.shadowBlur=0;
-    CX.fillStyle='#c9a84c';CX.fillRect(b.x+b.w*0.15,b.y-6,b.w*0.7,6);
-    CX.fillRect(b.x+b.w*0.25,b.y-11,3,5);CX.fillRect(b.x+b.w*0.45,b.y-13,3,7);CX.fillRect(b.x+b.w*0.6,b.y-11,3,5);
-    CX.fillStyle='#ff4400';CX.shadowColor='rgba(255,68,0,0.3)';CX.shadowBlur=6;
-    CX.fillRect(b.x+b.w*0.18,b.y+b.h*0.15,5,5);CX.fillRect(b.x+b.w*0.6,b.y+b.h*0.15,5,5);CX.shadowBlur=0;
-    CX.font='16px sans-serif';CX.textAlign='center';
-    CX.fillText(b.icon||'👑',b.x+b.w/2,b.y+b.h/2+4);
-    CX.font='10px sans-serif';CX.fillStyle='#ff6644';
-    CX.fillText(b.name,b.x+b.w/2,b.y-18);
-  }
-  
-  // Player
-  if(P){
-    CX.fillStyle='rgba(0,0,0,0.2)';
-    CX.beginPath();CX.ellipse(P.x+P.w/2,P.y+P.h+3,P.w/2,3,0,0,6.28);CX.fill();
-    if(P.dashing){
-      CX.globalAlpha=0.2;CX.fillStyle='#6a2b8a';
-      CX.fillRect(P.x-P.facing*6,P.y,P.w,P.h);CX.fillRect(P.x-P.facing*12,P.y,P.w,P.h);
-      CX.globalAlpha=1;
-    }
-    const fl=P.invincible>0&&Math.floor(P.invincible*10)%2===0;
-    CX.fillStyle=fl?'#fff':'#4a2b6a';
-    CX.fillRect(P.x,P.y,P.w,P.h);
-    if(GS.equipment.weapon){CX.fillStyle='#c9a84c';CX.fillRect(P.x+P.facing*5,P.y+3,3,16)}
-    // Eyes
-    CX.fillStyle='#c9a84c';
-    if(P.facing>0){CX.fillRect(P.x+P.w*0.6,P.y+P.h*0.2,2.5,2.5);CX.fillRect(P.x+P.w*0.35,P.y+P.h*0.2,2.5,2.5)}
-    else{CX.fillRect(P.x+P.w*0.45,P.y+P.h*0.2,2.5,2.5);CX.fillRect(P.x+P.w*0.15,P.y+P.h*0.2,2.5,2.5)}
-    if(P.blocking){
-      CX.strokeStyle='rgba(201,168,76,0.35)';CX.lineWidth=1.5;
-      CX.shadowColor='rgba(201,168,76,0.15)';CX.shadowBlur=6;
-      CX.strokeRect(P.x-3,P.y-3,P.w+6,P.h+6);CX.shadowBlur=0;
-    }
-    if(P.attacking&&P.atkT>0.15){
-      CX.fillStyle='rgba(255,255,255,0.15)';
-      const aw=14+(P.atkCombo||1)*5;
-      CX.fillRect(P.x+P.facing*P.w,P.y+3,P.facing*aw,10);
-    }
-  }
-  
-  // Projectiles
-  GS.projectiles.forEach(p=>{
-    CX.fillStyle=p.c||'#fff';
-    if(p.type==='magic'){CX.shadowColor='rgba(68,136,255,0.5)';CX.shadowBlur=8}
-    else if(p.type==='b_magic'){CX.shadowColor='rgba(255,68,0,0.5)';CX.shadowBlur=8}
-    CX.fillRect(p.x,p.y,p.w,p.h);
-    CX.shadowBlur=0;
-  });
-  
-  CX.restore();
-  
-  // HUD overlay text
-  CX.fillStyle='rgba(255,255,255,0.08)';
-  CX.font='8px monospace';CX.textAlign='left';
-  CX.fillText('FPS:'+GS.fps+' '+(MAPS[GS.curMap]?.name||''),6,12);
-}
-
-// ----- MINI MAP -----
-const MM=document.getElementById('miniMap'),MMX=MM.getContext('2d');
-function drawMiniMap(){
-  if(!MM||!GS.player)return;
-  const W=MM.width,HH=MM.height;
-  MMX.clearRect(0,0,W,HH);
-  MMX.fillStyle='rgba(0,0,0,0.6)';MMX.fillRect(0,0,W,HH);
-  // Player dot
-  const px=(GS.player.x/GS.world.w)*W,py=(GS.player.y/GS.world.h)*HH;
-  MMX.fillStyle='#c9a84c';MMX.beginPath();MMX.arc(px,py,2.5,0,6.28);MMX.fill();
-  MMX.fillStyle='rgba(255,255,255,0.08)';MMX.beginPath();MMX.arc(px,py,5,0,6.28);MMX.fill();
-  // Enemy dots
-  GS.enemies.forEach(e=>{if(e.alive){MMX.fillStyle='#ff4444';MMX.fillRect((e.x/GS.world.w)*W-1,(e.y/GS.world.h)*HH-1,2,2)}});
-  // Boss dot
-  if(GS.boss&&GS.boss.alive){MMX.fillStyle='#ff4400';MMX.beginPath();MMX.arc((GS.boss.x/GS.world.w)*W,(GS.boss.y/GS.world.h)*HH,3,0,6.28);MMX.fill()}
-}
-
-// ----- HUD UPDATE -----
-function updateHUD(){
-  const P=GS.player;if(!P)return;
-  document.getElementById('hpBar').style.width=(P.hp/P.maxHP*100)+'%';
-  document.getElementById('hpText').textContent=Math.ceil(P.hp)+'/'+P.maxHP;
-  document.getElementById('mpBar').style.width=(P.mp/P.maxMP*100)+'%';
-  document.getElementById('mpText').textContent=Math.ceil(P.mp)+'/'+P.maxMP;
-  document.getElementById('energyBar').style.width=(P.energy/P.maxEnergy*100)+'%';
-  document.getElementById('energyText').textContent=Math.ceil(P.energy)+'/'+P.maxEnergy;
-  document.getElementById('expBar').style.width=(P.exp/P.expNext*100)+'%';
-  document.getElementById('expText').textContent=Math.floor(P.exp)+'/'+P.expNext;
-  document.getElementById('hudStats').textContent='Lv.'+P.lvl+' · 💰'+P.gold+' · 🗡'+P.baseAtk+' 🛡'+P.baseDef;
-}
-
-// ----- INTERACT -----
-function interact(){
-  const P=GS.player;
-  GS.npcs.forEach(n=>{
-    if(Math.abs(P.x-n.x)<50&&Math.abs(P.y-n.y)<40){
-      showDialogue(n.name,n.dia);
-    }
-  });
-}
-
-function showDialogue(speaker,text){
-  document.getElementById('dialogueBox')?.remove();
-  const db=document.createElement('div');
-  db.id='dialogueBox';
-  db.style.cssText='position:absolute;bottom:70px;left:50%;transform:translateX(-50%);z-index:35;background:rgba(5,0,12,0.92);border:1px solid rgba(201,168,76,0.3);border-radius:8px;padding:14px 18px;max-width:480px;width:90%;animation:modalIn 0.3s ease;pointer-events:auto';
-  db.innerHTML=`<div style="color:#c9a84c;font-size:12px;font-weight:700;margin-bottom:4px">${speaker}</div><div style="color:#d0c0e0;font-size:12px;line-height:1.5">${text}</div><div style="text-align:right;margin-top:6px;color:rgba(255,255,255,0.25);font-size:10px;cursor:pointer" onclick="this.parentElement.remove()">▶ Click to close</div>`;
-  document.getElementById('game-screen').appendChild(db);
-}
-
-// ----- INVENTORY -----
-function openInventory(){
-  document.getElementById('inventoryModal').classList.add('active');
-  renderInventory();GS.paused=true;
-}
-function closeInventory(){document.getElementById('inventoryModal').classList.remove('active');GS.paused=false}
-let selectedInvItem=null;
-
-function renderInventory(){
-  const grid=document.getElementById('invGrid');
-  const count=document.getElementById('invCount');
-  const items=GS.inventory;
-  count.textContent=items.length;
-  grid.innerHTML='';
-  if(items.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.2);font-size:11px;padding:20px">Inventory empty</div>';return}
-  items.forEach((item,i)=>{
-    const d=ITEMS[item.id];
-    if(!d)return;
-    const s=document.createElement('div');
-    s.className='inv-slot'+(selectedInvItem===i?' selected':'');
-    s.innerHTML=`<div class="slot-icon">${d.icon||'?'}</div><div class="slot-name">${d.name}</div>${item.count>1?`<div class="slot-count">x${item.count}</div>`:''}`;
-    s.onclick=()=>{selectedInvItem=i;renderInventory();showItemDetail(i)};
-    grid.appendChild(s);
-  });
-  // Equipment
-  ['weapon','armor','helmet','ring','amulet','boots'].forEach(s=>{
-    const el=document.getElementById('eq'+s);
-    if(GS.equipment[s]){const di=ITEMS[GS.equipment[s]];el.textContent=di?di.icon+' '+di.name:'Equipped'}
-    else el.textContent='Empty';
-  });
-}
-
-function showItemDetail(idx){
-  const item=GS.inventory[idx];if(!item)return;
-  const d=ITEMS[item.id];if(!d)return;
-  const det=document.getElementById('invDetail');
-  det.style.display='block';
-  document.getElementById('idName').textContent=(d.icon||'?')+' '+d.name+(item.count>1?' x'+item.count:'');
-  document.getElementById('idDesc').textContent=d.desc||'';
-  let stats='';
-  if(d.atk)stats+='⚔ ATK +'+d.atk+' ';
-  if(d.def)stats+='🛡 DEF +'+d.def+' ';
-  if(d.mag)stats+='🔮 MAG +'+d.mag+' ';
-  if(d.heal)stats+='❤ Heal '+d.heal;
-  if(d.manaRestore)stats+='💠 Mana '+d.manaRestore;
-  document.getElementById('idStats').textContent=stats||'Type: '+(d.type||'item');
-  document.getElementById('idUseBtn').style.display=d.type==='consumable'?'block':'none';
-  document.getElementById('idEquipBtn').style.display=(d.slot)?'block':'none';
-}
-
-function useSelectedItem(){
-  const item=GS.inventory[selectedInvItem];if(!item)return;
-  const d=ITEMS[item.id];if(!d||d.type!=='consumable')return;
-  if(d.effect)d.effect(GS.player);
-  item.count=(item.count||1)-1;
-  if(item.count<=0)GS.inventory.splice(selectedInvItem,1);
-  selectedInvItem=-1;
-  renderInventory();updateHUD();
-}
-
-function equipSelected(){
-  const item=GS.inventory[selectedInvItem];if(!item)return;
-  const d=ITEMS[item.id];if(!d||!d.slot){showNotif('⚠','Cannot equip this item');return}
-  // Unequip current
-  const cur=GS.equipment[d.slot];
-  if(cur)GS.inventory.push({id:cur,count:1});
-  GS.equipment[d.slot]=item.id;
-  item.count=(item.count||1)-1;
-  if(item.count<=0)GS.inventory.splice(selectedInvItem,1);
-  selectedInvItem=-1;
-  showNotif('✅','Equipped '+d.name);playSFX('click');
-  renderInventory();updateHUD();
-}
-
-function unequipItem(slot){
-  if(!GS.equipment[slot])return;
-  const id=GS.equipment[slot];
-  addItem(id);
-  delete GS.equipment[slot];
-  showNotif('↩','Unequipped');playSFX('click');
-  renderInventory();updateHUD();
-}
-
-function dropSelected(){
-  const item=GS.inventory[selectedInvItem];if(!item)return;
-  if(!confirm('Drop '+ITEMS[item.id]?.name+'?'))return;
-  item.count=(item.count||1)-1;
-  if(item.count<=0)GS.inventory.splice(selectedInvItem,1);
-  selectedInvItem=-1;
-  renderInventory();
-}
-
-function sortInventory(){
-  GS.inventory.sort((a,b)=>{
-    const da=ITEMS[a.id],db=ITEMS[b.id];
-    if(!da||!db)return 0;
-    return da.name.localeCompare(db.name);
-  });
-  renderInventory();
-}
-
-function addItem(id,count=1){
-  const existing=GS.inventory.find(i=>i.id===id);
-  if(existing)existing.count=(existing.count||1)+count;
-  else GS.inventory.push({id,count});
-  GS.stats.itemsCollected=(GS.stats.itemsCollected||0)+count;
-  checkAchievements();
-}
-
-function useHealthPotion(){useItemType('health_potion')}
-function useManaPotion(){useItemType('mana_potion')}
-
-function useItemType(id){
-  const idx=GS.inventory.findIndex(i=>i.id===id);
-  if(idx<0){showNotif('⚠','No potions available!','Buy from the shop');return}
-  const item=GS.inventory[idx];
-  const d=ITEMS[id];
-  if(d&&d.effect)d.effect(GS.player);
-  item.count=(item.count||1)-1;
-  if(item.count<=0)GS.inventory.splice(idx,1);
-  updateHUD();
-}
-
-// ----- SHOP -----
-function openShop(){
-  document.getElementById('shopModal').classList.add('active');GS.paused=true;
-  GS.shopTab='potion';renderShop();
-}
-function closeShop(){document.getElementById('shopModal').classList.remove('active');GS.paused=false}
-
-function renderShop(){
-  const cats=document.getElementById('shopCats');
-  const items=document.getElementById('shopItems');
-  document.getElementById('shopGold').textContent=GS.player?.gold||0;
-  cats.innerHTML='';
-  Object.keys(SHOP_CATS).forEach(k=>{
-    const b=document.createElement('button');
-    b.className='shop-cat'+(GS.shopTab===k?' active':'');
-    b.textContent={potion:'🧪 Potions',weapon:'🗡 Weapons',armor:'🛡 Armor',helmet:'⛑ Helmets',accessory:'💍 Accessories'}[k]||k;
-    b.onclick=()=>{GS.shopTab=k;renderShop()};
-    cats.appendChild(b);
-  });
-  items.innerHTML='';
-  const cat=SHOP_CATS[GS.shopTab];
-  if(!cat){items.innerHTML='<div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.2)">Empty</div>';return}
-  cat.forEach(id=>{
-    const d=ITEMS[id];if(!d)return;
-    const owned=GS.inventory.find(i=>i.id===id);
-    const s=document.createElement('div');
-    s.className='shop-item';
-    s.innerHTML=`<div class="si-icon">${d.icon||'?'}</div><div class="si-name">${d.name}</div><div class="si-price">💰 ${d.price} gold</div>${owned?`<div class="si-owned">Owned: ${owned.count||1}</div>`:''}`;
-    s.onclick=()=>buyItem(id);
-    items.appendChild(s);
-  });
-}
-
-function buyItem(id){
-  const d=ITEMS[id];if(!d)return;
-  const P=GS.player;
-  if(P.gold<d.price){showNotif('⚠','Not enough gold!');return}
-  P.gold-=d.price;
-  addItem(id);
-  playSFX('coin');
-  document.getElementById('shopGold').textContent=P.gold;
-  renderShop();updateHUD();
-}
-
-// ----- SKILL TREE -----
-function openSkillTree(){
-  document.getElementById('skillModal').classList.add('active');GS.paused=true;
-  renderSkills();
-}
-function closeSkillTree(){document.getElementById('skillModal').classList.remove('active');GS.paused=false}
-
-function renderSkills(){
-  document.getElementById('skillPts').textContent=GS.player?.skillPts||0;
-  const grid=document.getElementById('skillGrid');
-  grid.innerHTML='';
-  Object.entries(SKILLS).forEach(([id,sk])=>{
-    const lvl=GS.skills[id]||0;
-    const maxed=lvl>=sk.max;
-    const card=document.createElement('div');
-    card.className='skill-card'+(lvl>0?' owned':'')+(maxed?' maxed':'');
-    card.innerHTML=`<div class="sk-icon">${sk.icon||'⭐'}</div><div class="sk-name">${sk.name}</div><div class="sk-lvl">${'■'.repeat(lvl)}${'□'.repeat(sk.max-lvl)}</div><div class="sk-desc">${sk.desc}</div>${!maxed?`<div class="sk-cost">Cost: ${sk.cost} SP</div>`:'<div class="sk-cost" style="color:#44aa44">MAXED</div>'}`;
-    card.onclick=()=>learnSkill(id);
-    grid.appendChild(card);
-  });
-}
-
-function learnSkill(id){
-  const sk=SKILLS[id];if(!sk)return;
-  const P=GS.player;
-  const lvl=GS.skills[id]||0;
-  if(lvl>=sk.max){showNotif('⚠','Skill already maxed!');return}
-  if((P.skillPts||0)<sk.cost){showNotif('⚠','Not enough skill points!','Earn SP by leveling up.');return}
-  P.skillPts-=sk.cost;
-  GS.skills[id]=(lvl||0)+1;
-  playSFX('levelup');
-  showNotif('⭐','Skill learned!',sk.name+' Lv.'+GS.skills[id]);
-  // Apply passive
-  if(id==='vitality'){P.maxHP+=15;P.hp=Math.min(P.maxHP,P.hp+15)}
-  renderSkills();updateHUD();
-}
-
-// ----- QUESTS -----
-function openQuests(){
-  document.getElementById('questModal').classList.add('active');GS.paused=true;
-  GS.questTab='main';renderQuests();
-}
-function closeQuests(){document.getElementById('questModal').classList.remove('active');GS.paused=false}
-function switchQuestTab(tab){GS.questTab=tab;document.querySelectorAll('.quest-tab').forEach((el,i)=>{el.classList.toggle('active',['main','side','daily','completed'][i]===tab)});renderQuests()}
-
-function renderQuests(){
-  const el=document.getElementById('questList');
-  el.innerHTML='';
-  const qs=GS.quests.filter(q=>{
-    if(GS.questTab==='completed')return q.done;
-    return q.type===GS.questTab&&!q.done;
-  });
-  if(qs.length===0){el.innerHTML='<div style="text-align:center;color:rgba(255,255,255,0.2);padding:15px;font-size:11px">No quests here.</div>';return}
-  qs.forEach(q=>{
-    const div=document.createElement('div');
-    div.className='quest-item'+(q.done?' completed':'');
-    div.innerHTML=`<div class="qi-title">${q.done?'✅ ':''}${q.icon||'📜'} ${q.name}</div><div class="qi-desc">${q.desc}</div><div class="qi-progress">${q.done?'✅ Complete!':(q.prog||0)+' / '+q.cnt}</div>${q.rew?`<div class="qi-reward">Reward: ${q.rew.exp?q.rew.exp+' EXP ':''}${q.rew.gold?q.rew.gold+'💰 ':''}${q.rew.item?'+'+ITEMS[q.rew.item]?.name:''}</div>`:''}`;
-    el.appendChild(div);
-  });
-}
-
-function updateQuestKill(type){
-  GS.quests.forEach(q=>{
-    if(q.done)return;
-    if(q.obj==='kill'&&q.targ===type){q.prog=Math.min(q.cnt,(q.prog||0)+1);if(q.prog>=q.cnt)completeQuest(q)}
-    if(q.obj==='kill_any'){q.prog=Math.min(q.cnt,(q.prog||0)+1);if(q.prog>=q.cnt)completeQuest(q)}
-  });
-}
-function updateQuestBoss(id){
-  GS.quests.forEach(q=>{
-    if(q.done)return;
-    if(q.obj==='boss'&&q.targ===id){q.prog=Math.min(q.cnt,(q.prog||0)+1);if(q.prog>=q.cnt)completeQuest(q)}
-  });
-}
-
-function completeQuest(q){
-  q.done=true;
-  showNotif('✅','Quest Complete!',q.name);
-  playSFX('levelup');
-  claimQuestReward(q);
-}
-
-function claimQuestReward(q){
-  const P=GS.player;if(!q.rew||!P)return;
-  if(q.rew.exp){P.exp+=q.rew.exp;checkLevelUp()}
-  if(q.rew.gold){P.gold+=q.rew.gold;GS.stats.gold+=q.rew.gold}
-  if(q.rew.item)addItem(q.rew.item);
-  updateHUD();
-}
-  // ----- WORLD MAP -----
-function openWorldMap(){
-  document.getElementById('mapModal').classList.add('active');GS.paused=true;
-  renderMap();
-}
-function closeWorldMap(){document.getElementById('mapModal').classList.remove('active');GS.paused=false}
-
-function renderMap(){
-  const c=document.getElementById('mapContainer');
-  c.innerHTML='';
-  Object.entries(MAPS).forEach(([id,m])=>{
-    if(!m.pos)return;
-    const unlocked=GS.unlockedMaps.includes(id);
-    const current=GS.curMap===id;
-    const locked=!unlocked;
-    const pctX=(m.pos.x/100)*c.offsetWidth;
-    const pctY=(m.pos.y/100)*c.offsetHeight;
-    const el=document.createElement('div');
-    el.className='map-loc'+(current?' current':'')+(locked?' locked':'');
-    el.style.left=Math.max(0,Math.min(pctX,c.offsetWidth-60))+'px';
-    el.style.top=Math.max(0,Math.min(pctY,c.offsetHeight-25))+'px';
-    el.textContent=m.icon+' '+m.name;
-    if(!locked)el.onclick=()=>travelTo(id);
-    c.appendChild(el);
-  });
-}
-
-function travelTo(id){
-  if(!GS.unlockedMaps.includes(id)){showNotif('⚠','Area locked!','Defeat bosses to unlock more areas.');return}
-  if(id===GS.curMap){showNotif('','Already here!');return}
-  if(GS.bossFight){showNotif('⚠','Defeat the boss first!');return}
-  GS.enemies.forEach(e=>e.alive=false);
-  GS.boss=null;GS.bossFight=false;
-  document.getElementById('bossBar').style.display='none';
-  GS.curMap=id;loadMap(id);
-  const P=GS.player;
-  P.x=120;P.y=GS.world.h-80;P.vx=0;P.vy=0;P.invincible=0;
-  GS.projectiles=[];
-  updateHUD();
-  closeWorldMap();
-  showNotif('🗺',MAPS[id]?.name||id);
-  playSFX('click');
-}
-  // Add this at the end of drawGame() or in game loop
-setInterval(()=>{
-  if(GS.state==='playing'&&GS.player){
-    drawMiniMap();
-  }
-}, 500);
-
-function drawMiniMap(){
-  const MM=document.getElementById('miniMap');
-  if(!MM||!GS.player)return;
-  const W=MM.width,HH=MM.height;
-  const MMX=MM.getContext('2d');
-  MMX.clearRect(0,0,W,HH);
-  MMX.fillStyle='rgba(0,0,0,0.5)';MMX.fillRect(0,0,W,HH);
-  const px=(GS.player.x/GS.world.w)*W,py=(GS.player.y/GS.world.h)*HH;
-  MMX.fillStyle='#c9a84c';MMX.beginPath();MMX.arc(px,py,2.5,0,6.28);MMX.fill();
-  GS.enemies.forEach(e=>{if(e.alive){MMX.fillStyle='#ff4444';MMX.fillRect((e.x/GS.world.w)*W-1,(e.y/GS.world.h)*HH-1,2,2)}});
-  if(GS.boss&&GS.boss.alive){MMX.fillStyle='#ff4400';MMX.beginPath();MMX.arc((GS.boss.x/GS.world.w)*W,(GS.boss.y/GS.world.h)*HH,3,0,6.28);MMX.fill()}
-}
-  // ----- INIT -----
-function initSettings(){
-  document.getElementById('s_musicVol').value=SET.music;
-  document.getElementById('s_sfxVol').value=SET.sfx;
-  ['particles','shake','weather'].forEach(k=>{
-    const el=document.getElementById('s_'+k);
-    if(el){el.textContent=SET[k]?'ON':'OFF';el.classList.toggle('active',SET[k])}
-  });
-  // Check for save
-  const d=loadSaveData();
-  const cb=document.getElementById('btnContinue');
-  cb.style.display=d?'block':'none';
-}
-
-// Load settings on page start
-initSettings();
-
-// On achievements screen show, render
-const origShowScreen=showScreen;
-showScreen=function(id){
-  origShowScreen(id);
-  if(id==='achievements-screen')renderAchievementsUI();
-  if(id==='load-screen')renderSaveList();
-  if(id==='title-screen'){
-    const d=loadSaveData();
-    const cb=document.getElementById('btnContinue');
-    if(cb)cb.style.display=d?'block':'none';
-  }
-};
-
-// Keyboard shortcut for pause (P key)
-document.addEventListener('keydown',e=>{
-  if(e.key==='p'||e.key==='P'){
-    if(GS.state==='playing')togglePause();
-  }
-  if(e.key==='Escape'){
-    if(document.getElementById('pauseModal').classList.contains('active'))togglePause();
-    else if(document.getElementById('inventoryModal').classList.contains('active'))closeInventory();
-    else if(document.getElementById('shopModal').classList.contains('active'))closeShop();
-    else if(document.getElementById('skillModal').classList.contains('active'))closeSkillTree();
-    else if(document.getElementById('questModal').classList.contains('active'))closeQuests();
-    else if(document.getElementById('mapModal').classList.contains('active'))closeWorldMap();
-  }
-});
-  // Start particle BG animation
-function particleLoop(){
-  updateBP();drawBP();
-  requestAnimationFrame(particleLoop);
-}
-particleLoop();
-
-// Create weather container if not exists
-if(!document.getElementById('weatherContainer')){
-  const wc=document.createElement('div');wc.id='weatherContainer';
-  wc.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:hidden';
-  document.body.appendChild(wc);
-}
-</script>
+<!-- ===== HACKING MINI-GAME ===== -->
+<div class="modal-overlay" id="hackModal">
+  <div class="modal" style="max-width:450px;text-align:center">
+    <h2 class="neon-title" style="margin-bottom:8px">💻 HACKING TERMINAL</h2>
+    <div id="hackGame" style="margin:10px 0">
+      <div style="font-size:11px;color:var(--cyan);margin-bottom:6px" id="hackPrompt">SELECT TARGET...</div>
+      <div id="hackGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:280px;margin:0 auto"></div>
+      <div style="font-size:10px;color:var(--dim);margin-top:6px">HP: <span id="hackHP">3</span> · Level: <span id="hackLvl">1</span></div>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center">
+      <button class="menu-btn menu-btn-sm" onclick="startHackGame()">🔄 NEW</button>
+      <button class="menu-btn menu-btn-sm" onclick="closeHack()">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== INVENTORY MODAL ===== -->
+<div class="modal-overlay" id="invModal">
+  <div class="modal" style="max-width:560px">
+    <h2 class="neon-title">🎒 INVENTORY</h2>
+    <button class="modal-close" onclick="closeInv()">✕</button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:140px"><h3 style="font-size:10px;color:var(--cyan);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Equipment</h3>
+        <div class="equip-list">
+          <div class="eq-slot" onclick="unequip('weapon')"><span class="eq-label">🗡 Weapon</span><span class="eq-val" id="eqW">Empty</span></div>
+          <div class="eq-slot" onclick="unequip('armor')"><span class="eq-label">🛡 Armor</span><span class="eq-val" id="eqA">Empty</span></div>
+          <div class="eq-slot" onclick="unequip('helmet')"><span class="eq-label">⛑ Helmet</span><span class="eq-val" id="eqH">Empty</span></div>
+          <div class="eq-slot" onclick="unequip('gadget')"><span class="eq-label">🔧 Gadget</span><span class="eq-val" id="eqG">Empty</span></div>
+        </div>
+      </div>
+      <div style="flex:2;min-width:200px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <h3 style="font-size:10px;color:var(--cyan);text-transform:uppercase">Items <span id="invCount" style="color:var(--dim)">(0)</span></h3>
+          <div style="display:flex;gap:3px">
+            <button class="menu-btn menu-btn-sm" style="min-width:auto;padding:3px 8px;font-size:8px" onclick="sortInv()">🔀</button>
+            <button class="menu-btn menu-btn-sm" style="min-width:auto;padding:3px 8px;font-size:8px" onclick="closeInv();openShop()">🏪</button>
+          </div>
+        </div>
+        <div id="invGrid" class="inv-grid"></div>
+        <div id="invDetail" class="inv-det" style="display:none">
+          <h4 id="idName" style="color:var(--gold);font-size:12px"></h4>
+          <p id="idDesc" style="font-size:10px;color:var(--dim);margin:2px 0"></p>
+          <div class="stats" id="idStats" style="font-size:9px;color:rgba(255,255,255,0.3)"></div>
+          <div style="display:flex;gap:4px;margin-top:4px">
+            <button class="menu-btn menu-btn-sm" id="idUse" onclick="useSel()" style="min-width:auto;padding:3px 8px;font-size:8px">Use</button>
+            <button class="menu-btn menu-btn-sm" id="idEquip" onclick="equipSel()" style="min-width:auto;padding:3px 8px;font-size:8px">Equip</button>
+            <button class="menu-btn menu-btn-sm menu-btn-danger" onclick="dropSel()" style="min-width:auto;padding:3px 8px;font-size:8px">Drop</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SHOP MODAL ===== -->
+<div class="modal-overlay" id="shopModal">
+  <div class="modal" style="max-width:500px">
+    <h2 class="neon-title">🏪 NEON MARKET</h2>
+    <button class="modal-close" onclick="closeShop()">✕</button>
+    <div style="text-align:center;font-size:11px;color:var(--gold);margin-bottom:6px">💰 Credits: <span id="shopCred">0</span></div>
+    <div class="shop-tabs" id="shopTabs"></div>
+    <div id="shopItems" class="shop-items"></div>
+  </div>
+</div>
+
+<!-- ===== SKILL TREE MODAL ===== -->
+<div class="modal-overlay" id="skillModal">
+  <div class="modal" style="max-width:500px">
+    <h2 class="neon-title">🧬 SKILL TREE</h2>
+    <button class="modal-close" onclick="closeSkillTree()">✕</button>
+    <div style="text-align:center;font-size:10px;color:var(--cyan);margin-bottom:6px">Skill Points: <span id="skillPts">0</span></div>
+    <div id="skillGrid" class="skill-grid"></div>
+  </div>
+</div>
+
+<!-- ===== PAUSE MODAL ===== -->
+<div class="modal-overlay" id="pauseModal">
+  <div class="modal" style="max-width:280px;text-align:center">
+    <h2 class="neon-title">⏸ PAUSED</h2>
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <button class="menu-btn menu-btn-sm" onclick="togglePause()">▶ RESUME</button>
+      <button class="menu-btn menu-btn-sm" onclick="togglePause();openInv()">🎒 INVENTORY</button>
+      <button class="menu-btn menu-btn-sm" onclick="togglePause();openSkillTree()">🧬 SKILLS</button>
+      <button class="menu-btn menu-btn-sm" onclick="togglePause();if(GS.obj)showNotif('🎯',GS.obj)">🎯 MISSION</button>
+      <button class="menu-btn menu-btn-sm" onclick="saveGame();togglePause()">💾 SAVE</button>
+      <button class="menu-btn menu-btn-sm menu-btn-danger" onclick="if(confirm('Quit to menu?')){togglePause();stopGame()}">🚪 QUIT</button>
+    </div>
+    <button class="modal-close" onclick="togglePause()">✕</button>
+  </div>
+</div>
+
+<!-- ===== NOTIFICATION ===== -->
+<div id="notif"><div id="nIcon">⚔</div><div id="nTitle">Notif</div><div id="nDesc"></div></div>
+
+<script src="main.js"></script>
 </body>
 </html>
